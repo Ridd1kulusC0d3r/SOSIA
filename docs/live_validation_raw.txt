@@ -1,0 +1,29 @@
+2026-10-15T03:35Z
+-- github     blocked              conf=0.00  http_403  (1 req)
+OK gitlab     trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+OK bluesky    trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+OK mastodon   trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+-- reddit     blocked              conf=0.00  http_403  (1 req)
+OK devto      trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+OK twitch     differential         conf=0.65  check_says_exists_for_all_but_bodies_differ  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+OK telegram   trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 3/3 · aleatórios ausentes 6/6 → PASSOU
+OK youtube    trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+OK tiktok     trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+-- pinterest  soft404              conf=0.00  all_random_names_reported_as_existing  (4 req)
+-- medium     blocked              conf=0.00  http_403  (1 req)
+OK linktree   trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+-- instagram  unstable             conf=0.00  retry_after_unstable:2/3_random_names_reported_as_existing  (8 req)
+OK x          trusted              conf=0.95  negatives_missing_positive_found  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU
+-- facebook   soft404              conf=0.00  all_random_names_reported_as_existing  (4 req)
+OK threads    differential         conf=0.65  check_says_exists_for_all_but_bodies_differ  (4 req)
+     validação: conhecidos 2/2 · aleatórios ausentes 6/6 → PASSOU

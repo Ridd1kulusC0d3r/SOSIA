@@ -1,0 +1,657 @@
+{
+  "_comment": "verified_on=null: conector escrito a partir de documentação/observação pública, ainda NÃO validado ao vivo neste repositório. `sosia calibrate` mede o comportamento real antes de qualquer varredura; tier é só expectativa.",
+  "platforms": [
+    {
+      "id": "github",
+      "name": "GitHub",
+      "tier": "api",
+      "url": "https://github.com/{u}",
+      "probe_url": "https://api.github.com/users/{u}",
+      "username": {
+        "regex": "^[a-z0-9-]{1,39}$",
+        "min": 1,
+        "max": 39,
+        "forbid": [
+          "^-",
+          "-$",
+          "--"
+        ],
+        "separators": "-"
+      },
+      "check": {
+        "type": "json",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ],
+        "json_has": "login"
+      },
+      "bio": {
+        "type": "json",
+        "map": {
+          "display_name": "name",
+          "bio": "bio",
+          "followers": "followers",
+          "created": "created_at",
+          "link": "blog",
+          "location": "location"
+        }
+      },
+      "positive_control": "github",
+      "errors": [
+        "api rate limit exceeded"
+      ],
+      "verified_on": null,
+      "known_profiles": [
+        "github",
+        "torvalds",
+        "microsoft"
+      ]
+    },
+    {
+      "id": "gitlab",
+      "name": "GitLab",
+      "tier": "api",
+      "url": "https://gitlab.com/{u}",
+      "probe_url": "https://gitlab.com/api/v4/users?username={u}",
+      "username": {
+        "regex": "^[a-z0-9._-]{2,255}$",
+        "min": 2,
+        "max": 255,
+        "forbid": [
+          "^[-.]",
+          "[-.]$"
+        ],
+        "separators": "._-"
+      },
+      "check": {
+        "type": "json",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ],
+        "json_nonempty": true
+      },
+      "bio": {
+        "type": "json",
+        "map": {
+          "display_name": "0.name",
+          "bio": "0.bio",
+          "link": "0.website_url",
+          "created": "0.created_at"
+        }
+      },
+      "positive_control": "dzaporozhets",
+      "verified_on": null,
+      "known_profiles": [
+        "dzaporozhets",
+        "sytses"
+      ]
+    },
+    {
+      "id": "bluesky",
+      "name": "Bluesky",
+      "tier": "api",
+      "url": "https://bsky.app/profile/{u}.bsky.social",
+      "probe_url": "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor={u}.bsky.social",
+      "username": {
+        "regex": "^[a-z0-9-]{3,63}$",
+        "min": 3,
+        "max": 63,
+        "forbid": [
+          "^-",
+          "-$"
+        ],
+        "separators": "-"
+      },
+      "check": {
+        "type": "json",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          400,
+          404
+        ],
+        "json_has": "did"
+      },
+      "bio": {
+        "type": "json",
+        "map": {
+          "display_name": "displayName",
+          "bio": "description",
+          "followers": "followersCount",
+          "created": "createdAt"
+        }
+      },
+      "positive_control": "jay",
+      "verified_on": null,
+      "known_profiles": [
+        "jay",
+        "pfrazee"
+      ]
+    },
+    {
+      "id": "mastodon",
+      "name": "Mastodon (mastodon.social)",
+      "tier": "api",
+      "url": "https://mastodon.social/@{u}",
+      "probe_url": "https://mastodon.social/api/v1/accounts/lookup?acct={u}",
+      "username": {
+        "regex": "^[a-z0-9_]{1,30}$",
+        "min": 1,
+        "max": 30,
+        "separators": "_"
+      },
+      "check": {
+        "type": "json",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ],
+        "json_has": "id"
+      },
+      "bio": {
+        "type": "json",
+        "map": {
+          "display_name": "display_name",
+          "bio": "note",
+          "followers": "followers_count",
+          "created": "created_at"
+        },
+        "html_fields": [
+          "bio"
+        ]
+      },
+      "positive_control": "Gargron",
+      "verified_on": null,
+      "known_profiles": [
+        "Gargron",
+        "mastodon"
+      ]
+    },
+    {
+      "id": "reddit",
+      "name": "Reddit",
+      "tier": "api",
+      "protection": [
+        "ip_reputation"
+      ],
+      "url": "https://www.reddit.com/user/{u}",
+      "probe_url": "https://www.reddit.com/user/{u}/about.json",
+      "username": {
+        "regex": "^[a-z0-9_-]{3,20}$",
+        "min": 3,
+        "max": 20,
+        "separators": "_-"
+      },
+      "check": {
+        "type": "json",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ],
+        "json_has": "data.name"
+      },
+      "bio": {
+        "type": "json",
+        "map": {
+          "display_name": "data.subreddit.title",
+          "bio": "data.subreddit.public_description",
+          "created": "data.created_utc"
+        }
+      },
+      "positive_control": "spez",
+      "errors": [
+        "too many requests"
+      ],
+      "verified_on": null,
+      "known_profiles": [
+        "spez",
+        "reddit"
+      ]
+    },
+    {
+      "id": "devto",
+      "name": "DEV Community",
+      "tier": "api",
+      "url": "https://dev.to/{u}",
+      "probe_url": "https://dev.to/api/users/by_username?url={u}",
+      "username": {
+        "regex": "^[a-z0-9_]{2,30}$",
+        "min": 2,
+        "max": 30,
+        "separators": "_"
+      },
+      "check": {
+        "type": "json",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ],
+        "json_has": "username"
+      },
+      "bio": {
+        "type": "json",
+        "map": {
+          "display_name": "name",
+          "bio": "summary",
+          "link": "website_url",
+          "created": "joined_at"
+        }
+      },
+      "positive_control": "ben",
+      "verified_on": null,
+      "known_profiles": [
+        "ben",
+        "jess"
+      ]
+    },
+    {
+      "id": "twitch",
+      "name": "Twitch",
+      "tier": "walled",
+      "url": "https://www.twitch.tv/{u}",
+      "probe_url": "https://www.twitch.tv/{u}",
+      "username": {
+        "regex": "^[a-z0-9_]{4,25}$",
+        "min": 4,
+        "max": 25,
+        "forbid": [
+          "^_"
+        ],
+        "separators": "_"
+      },
+      "check": {
+        "type": "status_code",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ]
+      },
+      "positive_control": "twitch",
+      "verified_on": null,
+      "notes": "endpoint passport.twitch.tv/usernames retornou 404 vazio ao vivo; www.twitch.tv é SPA (esperado: descartado pela calibração)",
+      "protection": [
+        "spa_shell"
+      ],
+      "known_profiles": [
+        "twitch",
+        "ninja"
+      ]
+    },
+    {
+      "id": "telegram",
+      "name": "Telegram",
+      "tier": "html",
+      "url": "https://t.me/{u}",
+      "username": {
+        "regex": "^[a-z][a-z0-9_]{4,31}$",
+        "min": 5,
+        "max": 32,
+        "forbid": [
+          "__",
+          "_$"
+        ],
+        "separators": "_"
+      },
+      "check": {
+        "type": "message",
+        "present_strs": [
+          "tgme_page_title"
+        ],
+        "absent_strs": [
+          "tgme_page_icon"
+        ],
+        "found_status": [
+          200
+        ]
+      },
+      "bio": {
+        "type": "html",
+        "placeholders": [
+          "^you can contact @\\w+ right away\\.?$",
+          "^you can view and join @\\w+ right away\\.?$"
+        ]
+      },
+      "positive_control": "telegram",
+      "verified_on": null,
+      "notes": "ausente = página com ícone genérico (tgme_page_icon); presente = tgme_page_title (observado ao vivo)",
+      "known_profiles": [
+        "telegram",
+        "durov",
+        "botfather"
+      ]
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "tier": "html",
+      "url": "https://www.youtube.com/@{u}",
+      "username": {
+        "regex": "^[a-z0-9._-]{3,30}$",
+        "min": 3,
+        "max": 30,
+        "separators": "._-"
+      },
+      "check": {
+        "type": "status_code",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ]
+      },
+      "bio": {
+        "type": "html"
+      },
+      "positive_control": "youtube",
+      "errors": [
+        "before you continue to youtube"
+      ],
+      "verified_on": null,
+      "known_profiles": [
+        "youtube",
+        "google"
+      ]
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "tier": "html",
+      "protection": [
+        "js_challenge"
+      ],
+      "url": "https://www.tiktok.com/@{u}",
+      "username": {
+        "regex": "^[a-z0-9._]{2,24}$",
+        "min": 2,
+        "max": 24,
+        "forbid": [
+          "\\.$"
+        ],
+        "separators": "._"
+      },
+      "check": {
+        "type": "message",
+        "present_strs": [
+          "\"uniqueId\":\"{u}\""
+        ],
+        "absent_strs": [
+          "\"statusCode\":10221",
+          "\"statusCode\":10202"
+        ],
+        "found_status": [
+          200
+        ]
+      },
+      "bio": {
+        "type": "html"
+      },
+      "positive_control": "tiktok",
+      "verified_on": null,
+      "known_profiles": [
+        "tiktok",
+        "nasa"
+      ]
+    },
+    {
+      "id": "pinterest",
+      "name": "Pinterest",
+      "tier": "html",
+      "url": "https://www.pinterest.com/{u}/",
+      "username": {
+        "regex": "^[a-z0-9_]{3,30}$",
+        "min": 3,
+        "max": 30,
+        "separators": "_"
+      },
+      "check": {
+        "type": "status_code",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ]
+      },
+      "bio": {
+        "type": "html"
+      },
+      "positive_control": "pinterest",
+      "verified_on": null,
+      "known_profiles": [
+        "pinterest",
+        "nasa"
+      ]
+    },
+    {
+      "id": "medium",
+      "name": "Medium",
+      "tier": "html",
+      "protection": [
+        "cf_firewall"
+      ],
+      "url": "https://medium.com/@{u}",
+      "username": {
+        "regex": "^[a-z0-9_.]{1,30}$",
+        "min": 1,
+        "max": 30,
+        "forbid": [
+          "\\.\\."
+        ],
+        "separators": "._"
+      },
+      "check": {
+        "type": "status_code",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ]
+      },
+      "bio": {
+        "type": "html"
+      },
+      "positive_control": "medium",
+      "verified_on": null,
+      "known_profiles": [
+        "medium",
+        "netflixtechblog"
+      ]
+    },
+    {
+      "id": "linktree",
+      "name": "Linktree",
+      "tier": "html",
+      "url": "https://linktr.ee/{u}",
+      "username": {
+        "regex": "^[a-z0-9._-]{1,40}$",
+        "min": 1,
+        "max": 40,
+        "separators": "._-"
+      },
+      "check": {
+        "type": "status_code",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ]
+      },
+      "bio": {
+        "type": "html"
+      },
+      "positive_control": "linktree",
+      "verified_on": null,
+      "notes": "páginas de link-na-bio: canal frequente de golpe",
+      "known_profiles": [
+        "linktree",
+        "bbc"
+      ]
+    },
+    {
+      "id": "instagram",
+      "name": "Instagram",
+      "tier": "walled",
+      "protection": [
+        "login_wall",
+        "tls_fingerprint"
+      ],
+      "url": "https://www.instagram.com/{u}/",
+      "username": {
+        "regex": "^[a-z0-9._]{1,30}$",
+        "min": 1,
+        "max": 30,
+        "forbid": [
+          "\\.\\.",
+          "\\.$"
+        ],
+        "separators": "._"
+      },
+      "check": {
+        "type": "message",
+        "present_strs": [
+          "og:title"
+        ],
+        "absent_strs": [
+          "page isn't available",
+          "página não está disponível"
+        ],
+        "found_status": [
+          200
+        ]
+      },
+      "bio": {
+        "type": "html"
+      },
+      "positive_control": "instagram",
+      "errors": [
+        "login",
+        "challenge"
+      ],
+      "verified_on": null,
+      "notes": "sem login costuma ser inconclusivo; SOSIA não contorna o bloqueio",
+      "known_profiles": [
+        "instagram",
+        "nasa"
+      ]
+    },
+    {
+      "id": "x",
+      "name": "X (Twitter)",
+      "tier": "walled",
+      "protection": [
+        "spa_shell",
+        "login_wall"
+      ],
+      "url": "https://x.com/{u}",
+      "username": {
+        "regex": "^[a-z0-9_]{4,15}$",
+        "min": 4,
+        "max": 15,
+        "separators": "_"
+      },
+      "check": {
+        "type": "status_code",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ]
+      },
+      "positive_control": "x",
+      "verified_on": null,
+      "notes": "SPA: costuma responder 200 para tudo — caso de manual de soft-404/shell; a calibração descarta ou marca inconclusivo",
+      "known_profiles": [
+        "x",
+        "nasa"
+      ]
+    },
+    {
+      "id": "facebook",
+      "name": "Facebook",
+      "tier": "walled",
+      "protection": [
+        "login_wall"
+      ],
+      "url": "https://www.facebook.com/{u}",
+      "username": {
+        "regex": "^[a-z0-9.]{5,50}$",
+        "min": 5,
+        "max": 50,
+        "forbid": [
+          "\\.\\.",
+          "^\\.",
+          "\\.$"
+        ],
+        "separators": "."
+      },
+      "check": {
+        "type": "status_code",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ]
+      },
+      "positive_control": "facebook",
+      "verified_on": null,
+      "known_profiles": [
+        "facebook",
+        "nasa"
+      ]
+    },
+    {
+      "id": "threads",
+      "name": "Threads",
+      "tier": "walled",
+      "protection": [
+        "login_wall"
+      ],
+      "url": "https://www.threads.net/@{u}",
+      "username": {
+        "regex": "^[a-z0-9._]{1,30}$",
+        "min": 1,
+        "max": 30,
+        "forbid": [
+          "\\.\\.",
+          "\\.$"
+        ],
+        "separators": "._"
+      },
+      "check": {
+        "type": "status_code",
+        "found_status": [
+          200
+        ],
+        "missing_status": [
+          404
+        ]
+      },
+      "positive_control": "instagram",
+      "verified_on": null,
+      "known_profiles": [
+        "instagram",
+        "nasa"
+      ]
+    }
+  ]
+}
