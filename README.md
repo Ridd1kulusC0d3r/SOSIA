@@ -1,6 +1,8 @@
 # SÓSIA
 
 **Proteção de marca ou pessoa contra perfis que se passam por ela — OSINT passivo, explicável e mensurável.**
+
+[![Abrir no Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ridd1kulusC0d3r/SOSIA/blob/claude/laughing-davinci-bj48ot/notebooks/sosia_colab.ipynb)
 Python 3.11+, **zero dependências**, CLI amigável a pipelines de shell.
 
 ```bash
@@ -16,6 +18,8 @@ sosia bench                 # benchmark sintético reproduzível (≈10 s)
 > Prioridade ≠ veredito jurídico; **revisão humana antes de qualquer denúncia**.
 
 ---
+
+**No Colab:** `notebooks/sosia_colab.ipynb` instala o pacote, gera variantes, lê bios offline, calibra/valida os conectores *no seu IP*, varre, mostra o relatório, baixa o pacote de evidências (zip) e roda o bench. Células com 🌐 usam rede. (O link do badge aponta para a branch de desenvolvimento; ajuste para `main` após o merge.)
 
 ## O que o SÓSIA faz de diferente
 
