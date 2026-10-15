@@ -67,6 +67,15 @@ cai em modos de falha conhecidos e deixa explícito o teto de cada técnica; nã
 por template de bio** (não por gerador de atacante, que é compartilhado). Nenhuma calibração foi feita *com* os resultados de teste, mas o autor
 conhecia os templates ao escrever as regras (contaminação declarada). Para a prova real: `sosia eval` com perfis reais, dois revisores, divergências registradas.
 
-## 7. Não-objetivos
+## 7. Watch (`watch.py`)
+
+Compara execuções e emite `new_profile`, `escalated`/`deescalated`, `profile_changed` (nome, bio, links), `profile_gone` e `connector_change`.
+Decisões: (1) **queda de cobertura é evento** — `trusted→blocked` alerta, porque "nenhum achado" deixaria de significar "nenhum perfil";
+(2) com **zero conectores utilizáveis o estado não é atualizado**, evitando um falso "perfil removido" na rodada seguinte;
+(3) `latest.json` é gravado de forma atômica; histórico e `alerts.jsonl` ficam no diretório de estado;
+(4) `profile_gone` é ambíguo (takedown bem-sucedido *ou* falha de leitura): interprete junto de `connector_change`.
+Limite: ainda não compara avatar/logo (pHash exigiria decodificar imagens; fora do escopo "zero dependências").
+
+## 8. Não-objetivos
 
 Contornar login/CAPTCHA/WAF, rotação de IP/UA, scraping autenticado, coleta em massa de pessoas, automação de denúncia sem revisão humana.

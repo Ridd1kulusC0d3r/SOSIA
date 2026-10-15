@@ -135,10 +135,13 @@ sosia scan -c sosia.toml --out runs/minha-marca --format summary
 | `sosia triage MARCA --text "bio…"` | Não | Explicar sinais contextuais de uma bio |
 | `sosia pivots MARCA` | Não | Gerar buscas para clones sem handle semelhante |
 | `sosia diff old/case.json new/case.json` | Não | Comparar achados de duas execuções |
+| `sosia watch -c sosia.toml --state DIR` | Sim | **Watch:** varre, compara com o estado e emite eventos (novo perfil, bio alterada, escalonamento, perfil removido, **perda de cobertura de conector**) |
 | `sosia stix DIR/case.json` | Não | Ler o STIX produzido no pacote |
 | `sosia fit-priors HANDLE aliases.txt` | Não | Recalibrar massa das famílias com aliases conhecidos |
 | `sosia eval exemplos.jsonl` | Não | Avaliar triagem contra rótulos revisados |
 | `sosia bench [--quick]` | Não | Rodar regressões em ambiente **sintético** |
+
+`watch` usa os mesmos códigos de saída para eventos; não atualiza o estado se nenhum conector estiver utilizável (evita falso “perfil removido”). Exemplo agendado: [`examples/watch-workflow.yml`](examples/watch-workflow.yml).
 
 `scan` retorna código `0` sem prioridade ≥ ALTO, `10` para ALTO, `20` para CRÍTICO, `2` para erro de uso e `3` quando não há conector utilizável.
 

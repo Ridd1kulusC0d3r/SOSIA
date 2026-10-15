@@ -17,6 +17,7 @@ from .platforms import load_platforms
 from .profiles import Profile, find_links
 from .report import finding_line, summary_counts, to_jsonl, to_markdown, write_case
 from .scanner import ScanConfig, Scanner
+from .watch import exit_code as watch_exit_code, watch_step
 from .scoring import assess
 from .signals import analyze_bio
 from .textutil import similarity, slugify
@@ -149,6 +150,28 @@ def cmd_scan(a: argparse.Namespace) -> int:
     if res.stats["totals"]["platforms_usable"] == 0:
         return EXIT_NO_PLATFORM
     return EXIT_CRITICAL if top >= Priority.CRITICAL.rank else EXIT_HIGH if top >= Priority.HIGH.rank else EXIT_OK
+
+
+def cmd_watch(a: argparse.Namespace) -> int:
+    """Uma rodada de monitoramento: varre, compara com o estado e emite eventos (feito para cron/Actions)."""
+    brand, scan_cfg = _brand_from_args(a)
+    plats = load_platforms(a.platforms_file, a.platform or scan_cfg.get("platforms"))
+    rate = a.rate if a.rate is not None else scan_cfg.get("rate", 1.0)
+    f = UrlLibFetcher(user_agent=a.user_agent, min_interval=rate, timeout=a.timeout)
+    cfg = ScanConfig(budget=a.budget or scan_cfg.get("budget", 150), concurrency=a.concurrency, seed=a.seed,
+                     extra_candidates=a.watch or [], masses=_load_masses(a.priors))
+    res = Scanner(brand, plats, f, cfg, progress=None if a.quiet else _err).run()
+    if res.stats["totals"]["platforms_usable"] == 0:
+        _err("nenhum conector utilizável: estado NÃO atualizado (evita falso 'perfil removido')")
+        return EXIT_NO_PLATFORM
+    events, baseline = watch_step(res.to_dict(), a.state)
+    if baseline:
+        _err(f"baseline criado em {a.state}/ — próximas execuções geram eventos")
+    for e in events:
+        print(json.dumps(e, ensure_ascii=False) if a.format == "jsonl" else
+              f"[{e.get('priority','-'):<7}] {e['event']:<17} {e['platform']}/{e.get('username','')} "
+              + (f"({e['from']}→{e['to']})" if e["event"] == "connector_change" else e.get("url", "")))
+    return watch_exit_code(events)
 
 
 def cmd_triage(a: argparse.Namespace) -> int:
@@ -343,6 +366,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--format", choices=["summary", "json", "jsonl", "md"], default="summary")
     p.add_argument("-q", "--quiet", action="store_true")
     p.set_defaults(fn=cmd_scan)
+
+    p = sub.add_parser("watch", parents=[net], help="uma rodada de monitoramento com estado (cron/Actions)")
+    _common(p)
+    p.add_argument("--state", required=True, help="diretório de estado (latest.json, history/, alerts.jsonl)")
+    p.add_argument("--platform", action="append")
+    p.add_argument("--budget", type=int, default=0)
+    p.add_argument("--watch", action="append", help="username extra sempre consultado")
+    p.add_argument("--concurrency", type=int, default=8)
+    p.add_argument("--seed", type=int)
+    p.add_argument("--format", choices=["text", "jsonl"], default="text")
+    p.add_argument("-q", "--quiet", action="store_true")
+    p.set_defaults(fn=cmd_watch)
 
     p = sub.add_parser("triage", help="lê uma bio e explica a triagem (offline)")
     _common(p)

@@ -232,3 +232,52 @@ class BenchSmoke(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WatchTests(unittest.TestCase):
+    def case(self, bio, extra=None, state="trusted"):
+        plats = {"cleana": sim_platforms()["cleana"]}
+        prof = {"cleana": {
+            "marcazeta_suporte": ProfileSpec("Marca Zeta Suporte", bio, 5),
+            POSITIVE: ProfileSpec("Ref", "Perfil de referência para calibração.", 1),
+            POSITIVE2: ProfileSpec("Ref Dois", "Outro perfil de referência.", 2)}}
+        prof["cleana"].update(extra or {})
+        w = MockWorld({"cleana": SiteSpec("cleana", Behavior.CLEAN)}, prof)
+        b = Brand("Marca Zeta", "marcazeta", domains=["marcazeta.com.br"])
+        cfg = ScanConfig(budget=60, seed=1, extra_candidates=["marcazeta_suporte", "marcazeta_fas"])
+        d = Scanner(b, plats, w, cfg).run().to_dict()
+        d["calibrations"][0]["state"] = state
+        return d
+
+    def test_baseline_then_events(self):
+        from sosia.watch import exit_code, watch_step
+        scam = "Suporte oficial Marca Zeta. Chame no WhatsApp. Reembolso via Pix hoje!"
+        with tempfile.TemporaryDirectory() as d:
+            ev, base = watch_step(self.case("Perfil oficial Marca Zeta, novidades."), d)
+            self.assertTrue(base)
+            self.assertEqual(ev, [])
+            ev, base = watch_step(self.case(scam, extra={"marcazeta_fas": ProfileSpec("Marca Zeta Fãs", "Fãs. Não oficial.", 1)}), d)
+            kinds = {(e["event"], e["username"]) for e in ev}
+            self.assertIn(("new_profile", "marcazeta_fas"), kinds)
+            self.assertIn(("escalated", "marcazeta_suporte"), kinds)
+            self.assertIn(("profile_changed", "marcazeta_suporte"), kinds)
+            self.assertEqual(exit_code(ev), 20)
+            self.assertTrue((Path(d) / "alerts.jsonl").exists())
+            self.assertEqual(len(list((Path(d) / "history").glob("*.json"))), 2)
+
+    def test_gone_and_connector_loss_are_flagged(self):
+        from sosia.watch import compute_events, exit_code
+        a = self.case("Suporte oficial Marca Zeta. Chame no WhatsApp. Reembolso via Pix hoje!")
+        b = self.case("x", state="blocked")
+        b["findings"] = []
+        ev = compute_events(a, b)
+        kinds = {e["event"] for e in ev}
+        self.assertTrue({"profile_gone", "connector_change"} <= kinds)
+        conn = next(e for e in ev if e["event"] == "connector_change")
+        self.assertIn("cobertura perdida", conn["note"])
+        self.assertEqual(exit_code(ev), 10)
+
+    def test_no_changes_no_events(self):
+        from sosia.watch import compute_events
+        a = self.case("Perfil oficial Marca Zeta, novidades.")
+        self.assertEqual(compute_events(a, json.loads(json.dumps(a))), [])

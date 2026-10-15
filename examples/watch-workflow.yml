@@ -1,0 +1,33 @@
+# Copie para .github/workflows/sosia-watch.yml no repositório da MARCA (não neste).
+# Roda 1x/dia, guarda o estado como cache e abre uma issue quando há evento ALTO/CRÍTICO.
+name: sosia-watch
+on:
+  schedule: [{cron: "17 9 * * *"}]
+  workflow_dispatch:
+permissions: {contents: read, issues: write}
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4          # contém sosia.toml
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install "git+https://github.com/Ridd1kulusC0d3r/SOSIA@main"
+      - uses: actions/cache@v4
+        with:
+          path: .sosia-state
+          key: sosia-state-${{ github.run_id }}
+          restore-keys: sosia-state-
+      - name: Calibrar e vigiar
+        id: watch
+        run: |
+          set +e
+          sosia watch -c sosia.toml --state .sosia-state --format jsonl -q > events.jsonl
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+      - name: Abrir issue em caso de ALTO/CRÍTICO
+        if: steps.watch.outputs.code == '10' || steps.watch.outputs.code == '20'
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: gh issue create --title "SÓSIA: eventos de prioridade alta" --body-file events.jsonl
+      - name: Falhar se nenhum conector foi utilizável (cobertura zero)
+        if: steps.watch.outputs.code == '3'
+        run: exit 1
