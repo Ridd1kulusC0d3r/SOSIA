@@ -94,13 +94,13 @@ Os formulários dos Colabs pedem cinco entradas. Elas **não são equivalentes**
 
 | Campo mostrado | O que informar | Por que isso importa? | Exemplo fictício |
 |---|---|---|---|
-| **BRAND** | Nome público da marca/pessoa representada | Referência para bio, relatórios e nomes de exibição; não é o username-base | \`Marca Zeta\` |
-| **HANDLE** | Username-base **sem @** | Ponto de partida do gerador de variantes e da métrica de semelhança | \`marcazeta\` |
-| **DOMAINS** | Domínios legítimos separados por vírgulas, **sem https://** | Ajuda a distinguir links conhecidos, semelhantes e externos; **linkar um site não comprova vínculo** | \`marcazeta.com.br\` |
-| **OFFICIAL** | Usernames de contas comprovadamente oficiais | **Allowlist**: não tratar as próprias contas como suspeitas. Nunca inclua um perfil apenas porque ele afirma ser oficial | \`marcazeta, marcazeta_sac\` |
-| **EXTRA_AFFIXES** | Palavras específicas do setor, separadas por vírgulas | Amplia as famílias de candidatos com termos plausíveis, como "clube" ou "cartão"; não é uma lista de contas oficiais | \`clube, cartao\` |
+| **BRAND** | Nome público da marca/pessoa representada | Referência para bio, relatórios e nomes de exibição; não é o username-base | `Marca Zeta` |
+| **HANDLE** | Username-base **sem @** | Ponto de partida do gerador de variantes e da métrica de semelhança | `marcazeta` |
+| **DOMAINS** | Domínios legítimos separados por vírgulas, **sem https://** | Ajuda a distinguir links conhecidos, semelhantes e externos; **linkar um site não comprova vínculo** | `marcazeta.com.br` |
+| **OFFICIAL** | Usernames de contas comprovadamente oficiais | **Allowlist**: não tratar as próprias contas como suspeitas. Nunca inclua um perfil apenas porque ele afirma ser oficial | `marcazeta, marcazeta_sac` |
+| **EXTRA_AFFIXES** | Palavras específicas do setor, separadas por vírgulas | Amplia as famílias de candidatos com termos plausíveis, como "clube" ou "cartão"; não é uma lista de contas oficiais | `clube, cartao` |
 
-**Atenção:** o campo OFFICIAL nos Colabs é **global para todas as plataformas**. Para especificar um canal oficial somente no Instagram, X etc., use a seção \`[official]\` por plataforma no \`sosia.toml\`. Um erro nessa allowlist pode esconder um perfil que deveria ser investigado.
+**Atenção:** o campo OFFICIAL nos Colabs é **global para todas as plataformas**. Para especificar um canal oficial somente no Instagram, X etc., use a seção `[official]` por plataforma no `sosia.toml`. Um erro nessa allowlist pode esconder um perfil que deveria ser investigado.
 
 **Leia a documentação detalhada, com exemplos e erros frequentes:** [**Guia de configuração dos cinco campos**](docs/CONFIGURATION.md).
 
@@ -116,7 +116,7 @@ Os formulários dos Colabs pedem cinco entradas. Elas **não são equivalentes**
 | **Relatórios** | HTML, PDF, Markdown, JSON/JSONL, CSV, STIX | HTML, PDF, Markdown, JSON/JSONL, CSV, STIX |
 | **Acesso** | Dentro do seu Colab | Link temporário **com senha obrigatória** |
 
-**Para relatórios offline já existentes:** \`sosia.exports.export_reports\` gera HTML com a biblioteca padrão e PDF com o ReportLab **opcional**. O núcleo continua sem dependências externas obrigatórias. Consulte [Exportações e downloads](docs/EXPORTS.md).
+**Para relatórios offline já existentes:** `sosia.exports.export_reports` gera HTML com a biblioteca padrão e PDF com o ReportLab **opcional**. O núcleo continua sem dependências externas obrigatórias. Consulte [Exportações e downloads](docs/EXPORTS.md).
 
 
 ## Comece aqui
