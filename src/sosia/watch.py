@@ -10,6 +10,7 @@ from __future__ import annotations
 import datetime as _dt
 import json
 import os
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -86,7 +87,7 @@ def watch_step(case: dict, state_dir: str | Path) -> tuple[list[dict], bool]:
     events = compute_events(old, case)
     ts = _dt.datetime.now(_dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     payload = json.dumps(case, ensure_ascii=False, indent=2)
-    (sd / "history" / f"{ts}.json").write_text(payload, encoding="utf-8")
+    (sd / "history" / f"{ts}-{uuid.uuid4().hex[:12]}.json").write_text(payload, encoding="utf-8")
     tmp = sd / "latest.json.tmp"
     tmp.write_text(payload, encoding="utf-8")
     os.replace(tmp, latest)                                    # atômico: nunca deixa estado pela metade

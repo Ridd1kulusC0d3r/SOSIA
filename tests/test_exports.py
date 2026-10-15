@@ -121,5 +121,28 @@ class FrontendInputTests(unittest.TestCase):
         self.assertTrue(isinstance(rows, list))
 
 
+
+class NotebookStructureTests(unittest.TestCase):
+    def test_both_colabs_are_json_and_python_syntax_is_valid(self):
+        import json
+        notebooks = ("sosia_colab.ipynb", "sosia_frontend_colab.ipynb")
+        for filename in notebooks:
+            with self.subTest(notebook=filename):
+                path = ROOT / "notebooks" / filename
+                data = json.loads(path.read_text(encoding="utf-8"))
+                self.assertEqual(data.get("nbformat"), 4)
+                self.assertTrue(any(c.get("cell_type") == "code" for c in data["cells"]))
+                for i, cell in enumerate(data["cells"]):
+                    if cell.get("cell_type") != "code":
+                        continue
+                    source = "".join(cell["source"])
+                    # IPython shell lines (!) are Colab syntax rather than Python.
+                    lines = [
+                        "# Colab magic omitted" if line.lstrip().startswith(("!", "%")) else line
+                        for line in source.splitlines()
+                    ]
+                    compile("\n".join(lines), filename + ":" + str(i), "exec")
+
+
 if __name__ == "__main__":
     unittest.main()
