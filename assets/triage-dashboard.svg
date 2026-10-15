@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="650" viewBox="0 0 1240 650" role="img" aria-labelledby="title desc">
+<title id="title">Prévia conceitual do painel SÓSIA</title><desc id="desc">Interface ilustrativa com lista de três perfis fictícios, critérios de triagem e evidências. Não é uma captura da CLI nem dados reais.</desc>
+<defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#081422"/><stop offset="1" stop-color="#0e2536"/></linearGradient></defs>
+<rect width="1240" height="650" rx="20" fill="url(#g)"/>
+<g font-family="Inter,Segoe UI,Arial,sans-serif">
+<rect x="22" y="22" width="244" height="606" rx="16" fill="#0a1827" stroke="#263d51"/>
+<text x="47" y="65" font-size="33" font-weight="800" fill="#eef7ff">SÓSIA<tspan fill="#62e4be">.</tspan></text>
+<text x="47" y="94" font-size="13" letter-spacing="2" fill="#89a7b8">INTELLIGENCE CONSOLE</text>
+<path d="M47 116H240" stroke="#2d4557"/>
+<rect x="39" y="143" width="210" height="44" rx="10" fill="#153b40" stroke="#28796e"/><text x="57" y="171" font-size="16" font-weight="700" fill="#92f5d6">▣  Visão da investigação</text>
+<text x="57" y="227" font-size="16" fill="#9ab2c7">◫  Calibração</text>
+<text x="57" y="278" font-size="16" fill="#9ab2c7">◈  Perfis candidatos</text>
+<text x="57" y="329" font-size="16" fill="#9ab2c7">▤  Pacote de evidências</text>
+<text x="57" y="380" font-size="16" fill="#9ab2c7">↔  Diferença entre casos</text>
+<rect x="39" y="518" width="210" height="86" rx="12" fill="#13293b" stroke="#315268"/>
+<text x="57" y="546" font-size="13" fill="#94adbd">MODO</text><text x="57" y="577" font-size="16" font-weight="700" fill="#82e2ca">OSINT passivo</text>
+<text x="299" y="62" font-size="30" font-weight="700" fill="#f2f7fc">Visão geral / Marca Zeta</text>
+<text x="299" y="91" font-size="15" fill="#91acc0">Cenário demonstrativo · exemplos inteiramente fictícios</text>
+<g>
+<rect x="297" y="119" width="282" height="113" rx="15" fill="#132d3e" stroke="#2a5761"/>
+<text x="320" y="150" font-size="15" fill="#9fc5cf">CALIBRAÇÃO</text><text x="320" y="190" font-size="29" font-weight="800" fill="#8ef1d0">CONFIRMADA</text>
+<rect x="593" y="119" width="297" height="113" rx="15" fill="#202e40" stroke="#395167"/>
+<text x="616" y="150" font-size="15" fill="#b2bfd1">REGRA DE SEGURANÇA</text><text x="616" y="190" font-size="24" font-weight="800" fill="#e3eff9">403 ≠ AUSENTE</text>
+<rect x="904" y="119" width="309" height="113" rx="15" fill="#242a3e" stroke="#3c4e66"/>
+<text x="927" y="150" font-size="15" fill="#b0c2cf">PÓS-ANÁLISE</text><text x="927" y="190" font-size="24" font-weight="800" fill="#d6e9f2">REVISÃO HUMANA</text>
+</g>
+<rect x="297" y="257" width="570" height="351" rx="16" fill="#101f30" stroke="#30485e"/>
+<text x="321" y="293" font-size="20" font-weight="700" fill="#edf6fc">Perfis em análise</text>
+<text x="321" y="317" font-size="12" fill="#859fb2">Semelhança é um sinal, não uma condenação.</text>
+<g>
+<rect x="318" y="340" width="528" height="68" rx="10" fill="#142c36" stroke="#295653"/>
+<circle cx="349" cy="374" r="18" fill="#1e5952"/><text x="342" y="380" font-size="18" font-weight="700" fill="#9ef0d5">Z</text>
+<text x="381" y="367" font-size="17" font-weight="700" fill="#f1f6fa">@marcazeta</text><text x="381" y="388" font-size="13" fill="#98aabb">Conta autorizada</text>
+<rect x="729" y="354" width="100" height="29" rx="14" fill="#1b564b"/><text x="741" y="373" font-size="12" font-weight="700" fill="#98f2d8">ALLOWLIST</text>
+<rect x="318" y="422" width="528" height="68" rx="10" fill="#30232c" stroke="#824a5a"/>
+<circle cx="349" cy="456" r="18" fill="#8c404f"/><text x="343" y="462" font-size="17" font-weight="700" fill="#ffe4e1">!</text>
+<text x="381" y="449" font-size="17" font-weight="700" fill="#fff3f2">@marcazeta_suporte01</text><text x="381" y="470" font-size="13" fill="#d8bbc2">Alegação de oficialidade · pedido de Pix</text>
+<rect x="730" y="437" width="99" height="29" rx="14" fill="#7a394a"/><text x="745" y="456" font-size="12" font-weight="700" fill="#ffd4db">REVISAR</text>
+<rect x="318" y="504" width="528" height="68" rx="10" fill="#342f2c" stroke="#746147"/>
+<circle cx="349" cy="538" r="18" fill="#6b5632"/><text x="343" y="545" font-size="19" font-weight="700" fill="#ffe2ab">?</text>
+<text x="381" y="531" font-size="17" font-weight="700" fill="#fff0d8">@marcazeta_info</text><text x="381" y="551" font-size="13" fill="#e0cdb2">Acesso bloqueado · existência incerta</text>
+<rect x="715" y="519" width="115" height="29" rx="14" fill="#685236"/><text x="725" y="538" font-size="12" font-weight="700" fill="#ffe5b6">INCONCLUSIVO</text>
+</g>
+<rect x="888" y="257" width="325" height="351" rx="16" fill="#101f30" stroke="#30485e"/>
+<text x="909" y="293" font-size="20" font-weight="700" fill="#edf6fc">Por que revisar?</text>
+<text x="909" y="322" font-size="13" fill="#8ca9b9">Perfil fictício · suporte01</text>
+<path d="M910 339H1190" stroke="#2e465a"/>
+<circle cx="922" cy="369" r="6" fill="#f9bb75"/><text x="940" y="374" font-size="15" fill="#dcebf4">Alega vínculo oficial</text>
+<circle cx="922" cy="410" r="6" fill="#f38890"/><text x="940" y="415" font-size="15" fill="#dcebf4">Solicita pagamento</text>
+<circle cx="922" cy="451" r="6" fill="#77dbc1"/><text x="940" y="456" font-size="15" fill="#dcebf4">Bio com referência à marca</text>
+<path d="M910 478H1190" stroke="#2e465a"/>
+<text x="910" y="506" font-size="12" fill="#9cb1bd">AÇÃO RECOMENDADA</text>
+<text x="910" y="532" font-size="16" font-weight="700" fill="#faf3ed">Conferir evidências</text>
+<text x="910" y="555" font-size="15" fill="#d0deea">e validar o vínculo.</text>
+<text x="621" y="632" text-anchor="middle" font-size="13" fill="#829eaf">CONCEITO DE INTERFACE · NÃO É CAPTURA DO SOFTWARE · TODOS OS PERFIS SÃO FICTÍCIOS</text>
+</g></svg>
