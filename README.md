@@ -1,145 +1,279 @@
-# SÓSIA
+<div align="center">
 
-**Proteção de marca ou pessoa contra perfis que se passam por ela — OSINT passivo, explicável e mensurável.**
+<img src="assets/brand-hero.svg" alt="SÓSIA: inteligência contra perfis impostores. Arte de apresentação com painel fictício." width="100%" />
 
+<br />
+
+[![CI](https://github.com/Ridd1kulusC0d3r/SOSIA/actions/workflows/test.yml/badge.svg)](https://github.com/Ridd1kulusC0d3r/SOSIA/actions/workflows/test.yml)
+![Python](https://img.shields.io/badge/Python-3.11%2B-326ea8?logo=python&logoColor=white)
+![Runtime dependencies](https://img.shields.io/badge/runtime_dependencies-0-1d8b81)
+[![License](https://img.shields.io/badge/license-MIT-65768b)](LICENSE)
+![Status](https://img.shields.io/badge/approach-passive_OSINT-214057)
 [![Abrir no Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ridd1kulusC0d3r/SOSIA/blob/claude/laughing-davinci-bj48ot/notebooks/sosia_colab.ipynb)
-Python 3.11+, **zero dependências**, CLI amigável a pipelines de shell.
 
-```bash
-pip install -e .            # ou: PYTHONPATH=src python -m sosia ...
-sosia init                  # cria sosia.toml
-sosia calibrate --validate  # mede a saúde REAL de cada conector no seu ambiente
-sosia scan -c sosia.toml --out runs/marca-2026-10 --format summary
-sosia bench                 # benchmark sintético reproduzível (≈10 s)
-```
+**Investigação explicável de possíveis perfis impostores, com calibração por plataforma e evidências auditáveis.**
 
-> **Uso responsável.** Verificação passiva de dados públicos de perfis. Sem login, sem contornar CAPTCHA/bloqueios,
-> sem rotação de IP/User-Agent, rate limit por host, User-Agent honesto. Use para marca/pessoa que **você representa**.
-> Prioridade ≠ veredito jurídico; **revisão humana antes de qualquer denúncia**.
+[Visão geral](#visão-geral) · [Demonstração](#demonstração-visual) · [Instalação](#comece-aqui) · [Casos](#casos-de-investigação) · [Validação](#resultados-e-validação) · [Arquitetura](#arquitetura-e-documentação)
+
+</div>
+
+> **Colab:** `notebooks/sosia_colab.ipynb` instala o pacote, gera variantes, lê bios offline, calibra/valida os conectores no seu IP, varre, mostra o relatório e baixa o pacote de evidências. Células com 🌐 usam rede. O link do badge aponta para a branch de desenvolvimento; ajuste para `main` após o merge.
 
 ---
 
-**No Colab:** `notebooks/sosia_colab.ipynb` instala o pacote, gera variantes, lê bios offline, calibra/valida os conectores *no seu IP*, varre, mostra o relatório, baixa o pacote de evidências (zip) e roda o bench. Células com 🌐 usam rede. (O link do badge aponta para a branch de desenvolvimento; ajuste para `main` após o merge.)
+## Visão geral
 
-## O que o SÓSIA faz de diferente
+**Um username parecido não é prova de fraude. Um HTTP 200 não confirma a existência de um perfil. Um CAPTCHA não significa que a conta não existe.**
 
-A enumeração de usernames (Sherlock, Maigret…) e a geração de permutações (dnstwist, AIL) existem. O SÓSIA junta os quatro
-passos que costumam ficar soltos — **gerar → calibrar → confirmar → triar** — e trata a incerteza como cidadã de primeira classe:
+O SÓSIA é uma ferramenta de **Brand Impersonation Intelligence** com abordagem OSINT passiva. Ela gera variantes plausíveis de nomes de marcas, testa a confiabilidade de conectores, consulta sinais públicos disponíveis, interpreta o contexto de bios e produz uma **fila de revisão humana com justificativas e evidências**.
 
-| # | Princípio | Como está implementado |
-|---|---|---|
-| 1 | **"Nome impossível" vira calibração do conector** | 3 nomes aleatórios *sintaticamente válidos* + controle positivo; estados `trusted`, `differential`, `soft404`, `blind`, `blocked`, `error`, `unstable`, `unvalidated`, sempre com motivo (`calibrate.py`) |
-| 2 | **Soft-404 não é descartado às cegas** | Se o conector "acha" tudo mas o corpo dos negativos é estável e diferente do positivo, usa **impressão digital** do corpo — *e só se passar em validação* (≥2 perfis conhecidos + 6 negativos novos) |
-| 3 | **Canário em tempo de varredura** | A cada N consultas, um negativo novo (e, alternando, um positivo). Se falhar: recalibra, reprocessa o período suspeito ou degrada o conector. Drift de layout e CAPTCHA no meio da execução não viram falsos positivos |
-| 4 | **Bloqueio ≠ ausência** | 403/429/CAPTCHA/desafio → `inconclusivo` (com motivo), nunca "não existe" |
-| 5 | **Bio é evidência, não veredito** | Sinais agrupados, com **negação** ("nunca pedimos senha ou Pix"), mitigadores (fã/paródia), `aceitamos Pix` ≠ pedido de Pix, ofuscação (`p1x`), domínios parecidos/encurtadores |
-| 6 | **CRÍTICO é prioridade sustentada por evidência** | Exige: ≥2 grupos independentes de evidência (ou grupo duro + alegação de identidade) **+** bio lida **+** referência à marca **+** existência confirmada **+** sem disclaimer **+** não-allowlist |
-| 7 | **Dimensões separadas** | existência · semelhança · vínculo · evidência de abuso · severidade potencial · confiança (nunca um único número opaco) |
+Seu diferencial não está em listar a maior quantidade de nomes. Está em saber **quando confiar no resultado e quando declarar incerteza**.
 
-Também: ranking de variantes por **massa de probabilidade por família** (re-estimável com `sosia fit-priors` a partir do seu histórico de
-takedowns), pacote de evidências com **manifesto SHA-256**, exportação **STIX 2.1**, `diff` entre execuções (semente do *Watch*),
-vocabulário de fraude em **pt-BR**, "alavancas psicológicas" de engenharia social (autoridade, urgência, escassez, recompensa, medo,
-prova social, isolamento, comprometimento) anotadas por perfil.
+| Descoberta | Confiabilidade | Contexto | Evidência |
+| :-- | :-- | :-- | :-- |
+| Typos, homóglifos, separadores, afixos e dígitos | Controles negativos + positivos, detecção de soft-404, canários de drift | Alegações de oficialidade, pedido de pagamento, negações e disclaimers | Relatório Markdown, JSON/JSONL, CSV, STIX 2.1 e manifesto SHA-256 |
 
-## Pipeline
+> [!IMPORTANT]
+> **Uso autorizado e responsável.** O SÓSIA se destina à proteção de marcas ou pessoas que você representa. Não realiza login, não contorna CAPTCHA ou bloqueios, não rotaciona IP/UA e não automatiza denúncias. Suspeita ou prioridade **não equivale a prova de crime**. Sempre revise a evidência.
 
-```mermaid
-flowchart LR
-    B[marca + allowlist + domínios] --> V[VariantEngine<br/>typos · homóglifos · separadores<br/>afixos pt-BR · dígitos]
-    V -->|filtra por regra de username da plataforma| C
-    P[conectores JSON] --> CAL[calibração<br/>negativos aleatórios + positivo<br/>→ estado do conector]
-    CAL -->|usável?| C[sondas + canário<br/>recalibra / degrada]
-    C -->|FOUND/PROBABLE| X[perfil público<br/>nome · bio · links]
-    X --> S[sinais com negação,<br/>mitigadores e grupos]
-    S --> A[triagem multidimensional]
-    A --> O[case.json · report.md · CSV · STIX 2.1<br/>evidence/ · MANIFEST.sha256]
-```
+## Demonstração visual
 
-## Comandos
+### Uma investigação em seis quadros
 
-| comando | rede | para quê |
-|---|---|---|
-| `sosia variants MARCA [--platform x]` | não | variantes ranqueadas, filtradas pelas regras de username da plataforma |
-| `sosia platforms` | não | conectores e se foram validados ao vivo |
-| `sosia calibrate [--validate]` | sim | estado de cada conector **no seu IP/ambiente**; `--validate` mede acerto real |
-| `sosia scan -c sosia.toml --out DIR` | sim | varredura completa + pacote de evidências |
-| `sosia triage MARCA --text "bio…"` | não | explica a triagem de uma bio, linha a linha |
-| `sosia pivots MARCA` | não | consultas para clones **sem handle parecido** (nome de exibição, dorks) |
-| `sosia fit-priors HANDLE aliases.txt` | não | estima massas de família a partir de aliases reais conhecidos |
-| `sosia eval rotulados.jsonl` | não | **mede precisão/recall da triagem em perfis reais** rotulados por revisores |
-| `sosia diff old/case.json new/case.json` | não | perfis novos, bio alterada, escalonamento de prioridade |
-| `sosia bench [--quick]` | não | benchmark sintético (3 experimentos) |
+<div align="center">
+<img src="assets/sosia-tour.gif" width="720" alt="GIF animado didático do pipeline SÓSIA: geração, calibração, soft-404, bio, incerteza e evidências." />
 
-Códigos de saída do `scan`: `0` nada ≥ALTO · `10` há ALTO · `20` há CRÍTICO · `2` uso · `3` nenhum conector utilizável.
+<sub>🎞️ <strong>Animação conceitual.</strong> Sequência criada para explicar o processo. Não é uma gravação de varredura ou resultado de plataforma real.</sub>
+</div>
+
+### Painel de triagem proposto
+
+<div align="center">
+<img src="assets/triage-dashboard.svg" width="100%" alt="Protótipo visual fictício com calibragem, perfis para revisão, conta allowlist e acesso inconclusivo." />
+
+<sub>Imagem de produto **ilustrativa**, não captura de uma GUI existente. A versão atual do SÓSIA é uma CLI em Python.</sub>
+</div>
+
+**Explore o fluxo clicando em cada etapa:** há uma [demonstração HTML interativa](docs/demo/index.html) com três cenários fictícios, reprodução guiada, explicações contextuais e exportação local de um JSON de demonstração.
+
+A página funciona sem backend, sem bibliotecas externas e sem requisições a redes sociais. Para abrir como site local (GitHub exibe o código HTML, não executa o protótipo):
 
 ```bash
-# pipeline de shell: só o que merece atenção, com o porquê
-sosia scan -c sosia.toml -q --format jsonl \
-  | jq -r 'select(.assessment.priority=="CRITICO") | [.platform,.username,.url,(.assessment.reasons|join(" | "))] | @tsv'
+python -m http.server 8000 --directory docs
+# abra http://localhost:8000/demo/
 ```
 
-## Resultados — leia com cuidado
+Para quem prefere aprender por exemplo: [4 cenários documentados com comandos offline](examples/SCENARIOS.md) · [roteiro de vídeo e gravação de demonstração real](docs/MEDIA_GUIDE.md).
 
-### Bench sintético (`docs/BENCH_RESULTS.md`, seed 7, 10 marcas fictícias, 600 aliases)
+## Como o SÓSIA pensa
 
-Verdade-terreno gerada por um **atacante simulado independente do motor** (mutações aleatórias, afixos dentro *e fora* do léxico, handles sem
-relação com a marca), 12 comportamentos de plataforma (soft-404, SPA, login wall, rate limit, CAPTCHA, drift, instabilidade…) e armadilhas
-(revenda legítima que "aceita Pix", perfil oficial com aviso de segurança, fã/paródia, bio vazia).
+<img src="assets/pipeline.svg" alt="Pipeline de quatro estágios: gerar, calibrar, contextualizar e priorizar." width="100%" />
 
-| experimento | resultado (sintético) |
+**01 · Gerar candidatos.** O motor constrói variantes e aplica regras válidas de username por plataforma; prioriza famílias de mutação usando hipóteses ajustáveis por histórico local.
+
+**02 · Calibrar antes de confiar.** Negativos aleatórios válidos, perfil positivo conhecido, validação adicional e canários durante a execução ajudam a identificar soft-404, respostas instáveis, erros e mudança de comportamento.
+
+**03 · Ler evidências no contexto.** Nomes de exibição, bios públicas e links são interpretados com grupos de sinais, negações e mitigadores. "Aceitamos Pix" e "faça um Pix para liberar" não devem receber a mesma interpretação.
+
+**04 · Priorizar, não condenar.** A avaliação separa existência, similaridade, vínculo alegado, evidência de abuso, severidade potencial e confiança. Saídas inconclusivas mantêm o motivo; casos relevantes passam a revisão humana.
+
+### Por que isso importa na prática?
+
+| Resposta observada | Leitura ingênua | Leitura do SÓSIA |
+|---|---|---|
+| Página retorna HTTP 200 para qualquer nome | "Todos esses perfis existem" | **Soft-404**: controle negativo e positivo; descartar ou validar modo diferencial |
+| Servidor responde 403/429 ou mostra CAPTCHA | "Perfil não encontrado" | **Inconclusivo**: bloqueio é falta de observabilidade |
+| Bio diz "nunca pedimos Pix" | "Mencionou Pix, então é fraude" | **Negação / aviso de segurança** |
+| Bio diz "perfil de fãs, não oficial" | "Copia a marca" | **Mitigador**: exige análise contextual |
+| Bio alega ser suporte e solicita pagamento | "Fraude confirmada" | **Sinais para investigação**: confirmar existência, vínculo, contexto e evidência |
+
+## Comece aqui
+
+**Pré-requisitos:** Python 3.11+ e Git. O motor não exige dependências Python adicionais em tempo de execução.
+
+```bash
+git clone https://github.com/Ridd1kulusC0d3r/SOSIA.git
+cd SOSIA
+python -m venv .venv
+source .venv/bin/activate             # Windows: .venv\Scripts\activate
+python -m pip install -e .
+
+sosia --version
+sosia init                            # cria sosia.toml
+```
+
+Edite `sosia.toml` para definir uma **marca sob sua responsabilidade**, seus canais oficiais e domínios permitidos antes de iniciar a varredura real.
+
+```bash
+# Sem rede: explorar o gerador com marca fictícia
+sosia variants "Marca Zeta" --handle marcazeta --limit 12
+
+# Sem rede: testar o tratamento de uma bio de demonstração
+sosia triage "Marca Zeta" --handle marcazeta \
+  --username marcazeta_suporte01 \
+  --text "Suporte oficial Marca Zeta. Faça um Pix da taxa de liberação."
+
+# Com rede: verificar os conectores no SEU ambiente
+sosia calibrate --validate
+
+# Com rede: executar somente após configurar sua marca autorizada
+sosia scan -c sosia.toml --out runs/minha-marca --format summary
+```
+
+> [!NOTE]
+> `triage` avalia sinais textuais offline; **não confirma que o perfil existe**. `scan` e `calibrate` consultam fontes públicas, e os resultados de plataformas podem variar com IP, região e momento. A animação e os cenários deste README não foram gerados pela execução de um scan real.
+
+### Principais comandos
+
+| Comando | Usa rede? | Finalidade |
+|---|:---:|---|
+| `sosia init` | Não | Criar configuração inicial |
+| `sosia variants MARCA --handle HANDLE` | Não | Gerar e ranquear variantes válidas |
+| `sosia platforms` | Não | Inspecionar conectores disponíveis |
+| `sosia calibrate --validate` | Sim | Calibrar e validar os conectores localmente |
+| `sosia scan -c sosia.toml --out DIR` | Sim | Executar análise e gerar pacote de evidências |
+| `sosia triage MARCA --text "bio…"` | Não | Explicar sinais contextuais de uma bio |
+| `sosia pivots MARCA` | Não | Gerar buscas para clones sem handle semelhante |
+| `sosia diff old/case.json new/case.json` | Não | Comparar achados de duas execuções |
+| `sosia stix DIR/case.json` | Não | Ler o STIX produzido no pacote |
+| `sosia fit-priors HANDLE aliases.txt` | Não | Recalibrar massa das famílias com aliases conhecidos |
+| `sosia eval exemplos.jsonl` | Não | Avaliar triagem contra rótulos revisados |
+| `sosia bench [--quick]` | Não | Rodar regressões em ambiente **sintético** |
+
+`scan` retorna código `0` sem prioridade ≥ ALTO, `10` para ALTO, `20` para CRÍTICO, `2` para erro de uso e `3` quando não há conector utilizável.
+
+## Casos de investigação
+
+Todos os exemplos desta seção usam a **marca inventada Marca Zeta**. Nenhum username apresentado é alegado como conta real.
+
+<details>
+<summary><strong>Caso 01 · Suporte falso que alega oficialidade e cobra uma taxa</strong></summary>
+
+**Candidato:** `@marcazeta_suporte01`
+
+**Bio fictícia:** "Suporte oficial Marca Zeta. Chame no WhatsApp e faça o Pix da taxa de liberação."
+
+**Interpretação:** o nome semelhante é uma pista de descoberta; a alegação de vínculo e a solicitação de pagamento pertencem a grupos distintos de evidência. O próximo passo é validar se o perfil existe e se a conta está na lista oficial. **Não deduza CRÍTICO apenas deste texto offline**.
+
+```bash
+sosia triage "Marca Zeta" --handle marcazeta \
+  --username marcazeta_suporte01 \
+  --text "Suporte oficial Marca Zeta. Chame no WhatsApp e faça o Pix da taxa de liberação."
+```
+
+</details>
+
+<details>
+<summary><strong>Caso 02 · Comunidade de fãs que informa não ser oficial</strong></summary>
+
+**Candidato:** `@marcazeta_fas` · **Bio fictícia:** "Perfil de fãs. Não oficial. Memes."
+
+**Interpretação:** indicação explícita de conta não oficial é um mitigador. A similaridade de nome, sozinha, não sustenta um veredito de fraude.
+
+```bash
+sosia triage "Marca Zeta" --handle marcazeta \
+  --username marcazeta_fas --text "Perfil de fãs. Não oficial. Memes."
+```
+
+</details>
+
+<details>
+<summary><strong>Caso 03 · Revendedor que aceita Pix</strong></summary>
+
+**Candidato:** `@marcazeta_revenda` · **Bio fictícia:** "Revenda autorizada. Aceitamos Pix e cartão."
+
+**Interpretação:** divulgar meios de pagamento não é o mesmo que exigir transferência para desbloqueio. A declaração de revenda, por outro lado, não comprova autorização: vínculo oficial precisa ser verificado por fonte independente.
+
+</details>
+
+<details>
+<summary><strong>Caso 04 · Plataforma indisponível ou resposta ambígua</strong></summary>
+
+**Candidato:** `@marcazeta_info` · **Resposta hipotética:** 403, CAPTCHA ou 200 genérico para nomes inexistentes.
+
+**Interpretação:** existência **inconclusiva**. O motor procura motivos para não confiar no conector e não transforma bloqueio em ausência.
+
+</details>
+
+Mais detalhes, comandos e perguntas investigativas: **[Guia de cenários](examples/SCENARIOS.md)**.
+
+## Capacidades de engenharia
+
+| Mecanismo | Implementação / cuidado |
 |---|---|
-| **Geração** — recall de aliases descobríveis, orçamento 200 consultas | SÓSIA 24,1% · tipo-dnstwist 14,8% · tipo-Sherlock 2,6%. Em *typos* puros empata com o tipo-dnstwist; a diferença vem dos afixos. **Afixos fora do léxico: ~1%** (teto honesto). Handles sem relação com a marca: **0%** por construção |
-| **Existência** — 12 plataformas simuladas | `naive_status`: precisão 27,3%, 8.298 falsos positivos, 222 falsos negativos *silenciosos*. **SÓSIA: 0 FP, 0 FN silencioso**, 1.255 existentes ficam *inconclusivos* (visíveis, com motivo) em plataformas que ninguém consegue julgar |
-| **Triagem** — CRÍTICO vs golpe, split de teste | gatilho por palavra-chave (v1.1 como descrito): precisão 51,5%, recall 100%. SÓSIA multissinal: precisão 100%, **recall 42%** (golpes fora do léxico caem em ALTO/MÉDIO). ⚠️ precisão do SÓSIA é **otimista**, ver abaixo |
+| **Controles negativos + positivos** | Nomes impossíveis de existir *na prática*, mas sintaticamente válidos; controle com perfil conhecido |
+| **Estados explícitos** | `trusted`, `differential`, `soft404`, `blind`, `blocked`, `error`, `unstable`, `unvalidated` |
+| **Soft-404 diferencial** | Comparação de corpo com controles, **somente quando passa na validação** |
+| **Canário durante scan** | Verifica drift, CAPTCHA e mudança de resposta; degrada conector quando necessário |
+| **Léxico de fraude contextual** | Grupos de sinal, negação, ofuscação, alegação de identidade, mitigadores e alavancas de engenharia social |
+| **Condição para CRÍTICO** | Múltiplos indícios independentes ou grupo forte + identidade alegada, bio lida, marca citada, existência confirmada, sem disclaimer nem allowlist |
+| **Evidências** | `case.json`, `report.md`, CSV, STIX 2.1, `evidence/`, `MANIFEST.sha256` |
+| **Integração com pipelines** | `--format json/jsonl/md/summary` e códigos de saída adequados a automações defensivas |
 
-**O que estes números NÃO são:** taxas de detecção do mundo real; comparação com Doppel/Netcraft/Fortra; execução do Sherlock/dnstwist/Maigret
-(os baselines reimplementam a *lógica documentada*, minimamente). As regras de léxico/negação foram escritas pelo mesmo autor do corpus, com
-visibilidade dos templates de teste — por isso a precisão da triagem é um *teto*. Para medir de verdade use `sosia eval` com perfis reais
-rotulados por dois revisores. Detalhes e bugs que o bench achou no próprio motor: [`docs/DESIGN.md`](docs/DESIGN.md).
+## Resultados e validação
 
-### Validação ao vivo (`docs/LIVE_VALIDATION.md`, 2026-10-15, sandbox em nuvem)
+Os benchmarks existentes medem **um cenário sintético**, não precisão real do produto em redes sociais. A separação é intencional.
 
-17 conectores: **11 passaram** na validação (perfis conhecidos + negativos novos), 3 bloqueados (403), 2 descartados como soft-404, 1 instável→inconclusivo.
-Resultado depende de IP/região: **rode `sosia calibrate --validate` no seu ambiente** antes de confiar em qualquer plataforma. Nenhum conector está
-marcado como `verified_on` no repositório de propósito.
+| Experimento reproduzível | Resultado reportado | Ressalva |
+|---|---|---|
+| Descoberta de aliases com orçamento 200 | SÓSIA: **24,1%**; baseline tipo-dnstwist: **14,8%**; tipo-Sherlock: **2,6%** | Baselines reproduzem a lógica, não executam as ferramentas; afixos desconhecidos têm cobertura muito baixa |
+| Confirmação em 12 plataformas simuladas | Estratégia HTTP ingênua: **8.298 falsos positivos**; SÓSIA: **0 falsos positivos** e **1.255 existentes inconclusivos** | Apenas mundos simulados, com cenários projetados para avaliar falhas conhecidas |
+| Prioridade CRÍTICO vs golpe, split sintético de teste | **Precisão 100% / recall 42%** | Precisão otimista por conhecimento prévio do corpus; 58% dos golpes do split ficaram fora da classe CRÍTICO |
 
-## Limitações conhecidas (e honestas)
+Em uma validação pontual de conectores de **15/10/2026**, 11 de 17 foram utilizáveis e passaram nos controles no ambiente testado, 3 foram bloqueados, 2 deram soft-404 e 1 foi instável. Esse resultado **não é uma certificação de plataformas** e pode mudar de acordo com IP e região.
 
-- **Clones sem handle parecido** (copiam nome, logo e discurso) não são encontrados por enumeração. `sosia pivots` gera consultas; o *Watch* de imagem/logo (pHash) é roadmap.
-- **Plataformas muradas** (Instagram, Facebook…) tendem a ser inconclusivas sem login. O SÓSIA não contorna isso — e diz que não sabe.
-- **Modo diferencial** tem confiança menor (0,65): nunca promove a CRÍTICO sozinho.
-- **Priors** (massas de família, pesos de sinais) são hipóteses do autor, não medições. Re-estime com `fit-priors` e valide com `eval`.
-- **Léxico** é pt-BR primeiro, en/es mínimo; golpes fora do léxico caem em ALTO/MÉDIO (recall de CRÍTICO 42% no bench de teste).
-- Sem verificação de **vínculo oficial recíproco** (link do site oficial → perfil). Link para domínio oficial é só "alegação não verificada".
-- Dígitos depois de afixos cobrem poucos padrões; combinação *typo + afixo* tem cobertura baixa (~6% no bench).
+Leia os dados, metodologia e limites antes de utilizar os números:
 
-## Roadmap (módulos do mesmo projeto)
+- [Benchmark completo e reprodução](docs/BENCH_RESULTS.md)
+- [Validação ao vivo e saída bruta](docs/LIVE_VALIDATION.md)
+- [Decisões de engenharia e falhas descobertas](docs/DESIGN.md)
 
-1. **Core** ✅ variantes · calibração · confirmação · bio · evidências · STIX · bench · validação ao vivo
-2. **Bench** — corpus real rotulado (dupla revisão), split por período, publicação por plataforma
-3. **Watch** — monitoramento contínuo, mudanças de bio/avatar/links (`diff` é a semente)
-4. **Case** — estado do caso, pacote de denúncia por plataforma, acompanhamento
-5. **Campaigns** — agrupamento por links/contatos/imagens reutilizadas (cuidado: infraestrutura compartilhada ≠ autoria)
-6. Comparação visual (pHash de avatar/logo) e destino dos links (dnstwist-style para domínios das bios)
+## Limitações que importam
 
-## Referências
+- A descoberta por username não encontra automaticamente clones com nome/avatar iguais e **handle totalmente diferente**. `pivots` ajuda a gerar consultas, mas não resolve o problema.
+- Instagram, Facebook e outras plataformas com barreiras podem ficar inconclusivas. O projeto não burla login, CAPTCHA, rate limit ou WAF.
+- O modo diferencial tem confiança menor e não basta, por si só, para elevar a prioridade a CRÍTICO.
+- Os priors e pesos iniciais são hipóteses, não estatísticas de campo. `fit-priors` e `eval` ajudam a examinar essa lacuna.
+- Links para um domínio oficial na bio **não provam** que o perfil é oficialmente vinculado à marca; é necessário verificar a reciprocidade.
+- Não há UI de produção: a interface em HTML é exclusivamente um laboratório demonstrativo.
+- Análises de perfil devem seguir a finalidade de proteção de marca, minimizar dados pessoais e sempre passar por revisão humana.
 
-[dnstwist](https://github.com/elceef/dnstwist) (famílias de fuzzing, similaridade) ·
-[AIL typo-squatting](https://github.com/typosquatter/ail-typo-squatting) (operadores de mutação) ·
-[Maigret](https://github.com/soxoj/maigret) (checkType, `errors` vs ausência, verificação com username fictício) ·
-[x-impersonation-guard](https://github.com/wheelieinvestor/x-impersonation-guard) (múltiplos sinais, mitigação de paródia/fã, fila de revisão, evidência) ·
-[CISPA brand_impersonation](https://github.com/CISPA-SysSec/brand_impersonation) / *The Imitation Game* (USENIX Security 2024) ·
-[Unicode UTS #39](https://www.unicode.org/reports/tr39/) (skeleton: sinal de semelhança, não prova de intenção).
+## Arquitetura e documentação
 
----
+```text
+SOSIA/
+├── src/sosia/             # motor Python, CLI, regras e conectores
+│   ├── variants.py        # famílias e ranking de usernames
+│   ├── calibrate.py       # controle negativo/positivo e validação
+│   ├── scanner.py         # sondas, canários e contexto de varredura
+│   ├── signals.py         # leitura de bio e grupos de sinais
+│   ├── scoring.py         # triagem multidimensional
+│   └── report.py          # relatórios e cadeia de evidências
+├── assets/                # identidade visual e GIF ilustrativo
+├── docs/
+│   ├── demo/index.html    # experiência interativa local, dados fictícios
+│   ├── BENCH_RESULTS.md   # benchmark sintético reproduzível
+│   ├── LIVE_VALIDATION.md # validação pontual de conectores
+│   ├── DESIGN.md          # decisões, limites e bugs encontrados
+│   └── MEDIA_GUIDE.md     # guia para screencast real e vídeo
+├── examples/              # cenários e amostra de rótulos
+└── tests/                 # testes automatizados
+```
+
+**Roadmap:** benchmark real rotulado e revisado por duas pessoas; Watch com histórico e mudança de bio/avatar/links; Case para gestão do ciclo de resposta; agrupamento prudente de campanhas; comparação de imagem/logo. **Nenhum desses módulos futuros deve ser confundido com funcionalidade já entregue.**
+
+### Referências técnicas
+
+[dnstwist](https://github.com/elceef/dnstwist) ·
+[Maigret](https://github.com/soxoj/maigret) ·
+[AIL Typosquatting](https://github.com/typosquatter/ail-typo-squatting) ·
+[Unicode UTS #39](https://www.unicode.org/reports/tr39/) ·
+[CISPA brand impersonation](https://github.com/CISPA-SysSec/brand_impersonation).
 
 ### English summary
 
-SÓSIA generates look-alike handles (typos, homoglyphs, separators, pt-BR authority/support/promo affixes, digits), **calibrates every platform connector
-before trusting it** (random syntactically-valid negatives + positive control, differential body fingerprinting gated by validation, canary probes during the
-scan), treats blocks/CAPTCHAs/rate limits as *inconclusive* — never as absence — and reads profile bios as **contextual evidence**: grouped signals with negation,
-mitigators and explainable multi-dimensional triage. `CRITICAL` requires independent evidence groups, a readable bio, brand reference and confirmed existence.
-Ships with a reproducible synthetic benchmark (clearly labelled as such), live connector validation, a SHA-256-manifested evidence pack and STIX 2.1 export.
-Zero dependencies, Python 3.11+.
+**SÓSIA** is a zero-runtime-dependency Python CLI for defensive brand impersonation intelligence. It generates look-alike usernames, calibrates platform connectors using positive/negative controls, treats CAPTCHA/blocks as inconclusive, analyzes public bio context with negation and mitigating signals, and exports auditable evidence (SHA-256 manifest, STIX 2.1). Synthetic benchmarks are **not** real-world detection rates. The illustrated dashboard and interactive tour contain fictional examples only.
 
-MIT © Ridd1kulusC0d3r
+---
+
+<div align="center"><sub>Feito para investigar melhor, não para acusar mais rápido. · MIT © Ridd1kulusC0d3r</sub></div>

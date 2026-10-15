@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="460" viewBox="0 0 1280 460" role="img" aria-labelledby="title desc">
+<title id="title">SÓSIA, inteligência contra perfis impostores</title>
+<desc id="desc">Capa escura com mensagem de proteção de marca e painel fictício de investigação mostrando calibração e triagem explicável.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#081120"/><stop offset=".60" stop-color="#0d2033"/><stop offset="1" stop-color="#112539"/></linearGradient>
+ <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7cf4cf"/><stop offset="1" stop-color="#22bca6"/></linearGradient>
+ <linearGradient id="card" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#172a40"/><stop offset="1" stop-color="#101e31"/></linearGradient>
+ <pattern id="grid" width="35" height="35" patternUnits="userSpaceOnUse"><path d="M35 0H0V35" fill="none" stroke="#21405b" stroke-opacity=".24"/></pattern>
+ <filter id="glow" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="30"/></filter>
+</defs>
+<rect width="1280" height="460" fill="url(#bg)"/><rect width="1280" height="460" fill="url(#grid)"/>
+<circle cx="1045" cy="95" r="180" fill="#1aab9f" opacity=".16" filter="url(#glow)"/>
+<circle cx="680" cy="430" r="135" fill="#376bd7" opacity=".11" filter="url(#glow)"/>
+<g transform="translate(54 58)">
+ <rect x="0" y="0" width="62" height="62" rx="17" fill="#163449" stroke="#39776f"/>
+ <path d="M31 11L47 17V31C47 42 40 48 31 52C22 48 15 42 15 31V17L31 11Z" fill="none" stroke="#6be3c6" stroke-width="2.5"/>
+ <path d="M23 31l6 6 12-14" fill="none" stroke="#6be3c6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+ <text x="78" y="23" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" letter-spacing="3" font-weight="700" fill="#70d9c4">BRAND IMPERSONATION INTELLIGENCE</text>
+ <text x="0" y="154" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="98" font-weight="800" letter-spacing="-4" fill="#f4f8ff">SÓSIA<tspan fill="#60e3c4">.</tspan></text>
+ <text x="2" y="199" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" fill="#c8d9e6">Identifique o perfil. Valide a evidência.</text>
+ <text x="2" y="235" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" fill="#c8d9e6">Priorize o risco. Sem adivinhação.</text>
+ <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" font-weight="700">
+ <rect x="0" y="281" width="155" height="36" rx="18" fill="#164f4a" stroke="#2f8f80"/><text x="20" y="305" fill="#a6f8e2">OSINT PASSIVO</text>
+ <rect x="167" y="281" width="179" height="36" rx="18" fill="#1b3249" stroke="#38516c"/><text x="184" y="305" fill="#d0e0f1">TRIAGEM EXPLICÁVEL</text>
+ </g>
+</g>
+<g transform="translate(706 47)" font-family="Inter,Segoe UI,Arial,sans-serif">
+ <rect width="523" height="365" rx="22" fill="url(#card)" stroke="#31506a"/>
+ <circle cx="28" cy="26" r="5" fill="#f47e83"/><circle cx="46" cy="26" r="5" fill="#eeb767"/><circle cx="64" cy="26" r="5" fill="#63d9af"/>
+ <text x="92" y="31" font-size="15" font-weight="700" fill="#d9e7f5">SÓSIA / Investigation overview</text>
+ <path d="M0 54H523" stroke="#284057"/>
+ <rect x="23" y="74" width="232" height="83" rx="13" fill="#0d1d2d" stroke="#263f56"/>
+ <text x="39" y="99" font-size="13" fill="#99adbf">CONNECTOR HEALTH</text>
+ <text x="39" y="135" font-size="28" font-weight="800" fill="#85efcf">VALIDATED</text>
+ <circle cx="231" cy="115" r="7" fill="#6bdcbc"/>
+ <rect x="268" y="74" width="231" height="83" rx="13" fill="#0d1d2d" stroke="#263f56"/>
+ <text x="284" y="99" font-size="13" fill="#99adbf">DECISION POLICY</text>
+ <text x="284" y="135" font-size="27" font-weight="800" fill="#e6eff9">EVIDENCE</text>
+ <rect x="23" y="177" width="476" height="48" rx="11" fill="#122f37" stroke="#2a6d65"/>
+ <circle cx="45" cy="201" r="6" fill="#66dfbb"/><text x="64" y="207" font-size="16" fill="#e5fcf5">marcazeta</text>
+ <text x="368" y="207" font-size="12" font-weight="700" fill="#a4f0d7">ALLOWLIST</text>
+ <rect x="23" y="237" width="476" height="48" rx="11" fill="#3b2830" stroke="#81495a"/>
+ <circle cx="45" cy="261" r="6" fill="#ff8d96"/><text x="64" y="267" font-size="16" fill="#fff0ee">marcazeta_suporte01</text>
+ <rect x="402" y="248" width="78" height="24" rx="12" fill="#7c3949"/><text x="414" y="265" font-size="12" font-weight="700" fill="#ffccd1">REVISAR</text>
+ <rect x="23" y="297" width="476" height="48" rx="11" fill="#322d30" stroke="#5d5355"/>
+ <circle cx="45" cy="321" r="6" fill="#eac27c"/><text x="64" y="327" font-size="16" fill="#f0e7e6">perfil indisponível / CAPTCHA</text>
+ <text x="376" y="327" font-size="12" font-weight="700" fill="#f0ce99">INCONCLUSIVO</text>
+</g>
+<text x="57" y="433" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" fill="#8aa5b6">V1.1 • Python 3.11+ • sem dependências de runtime</text>
+<text x="1223" y="433" text-anchor="end" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" fill="#8aa5b6">INTERFACE ILUSTRATIVA · DADOS FICTÍCIOS</text>
+</svg>
