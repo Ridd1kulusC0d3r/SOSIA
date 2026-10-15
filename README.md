@@ -10,6 +10,7 @@
 [![License](https://img.shields.io/badge/license-MIT-65768b)](LICENSE)
 ![Status](https://img.shields.io/badge/approach-passive_OSINT-214057)
 [![Abrir no Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ridd1kulusC0d3r/SOSIA/blob/claude/laughing-davinci-bj48ot/notebooks/sosia_colab.ipynb)
+[![Abrir frontend no Colab](https://img.shields.io/badge/Colab-Frontend%20Visual-0e7669?logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/Ridd1kulusC0d3r/SOSIA/blob/claude/laughing-davinci-bj48ot/notebooks/sosia_frontend_colab.ipynb)
 
 **Investigação explicável de possíveis perfis impostores, com calibração por plataforma e evidências auditáveis.**
 
@@ -17,7 +18,7 @@
 
 </div>
 
-> **Colab:** `notebooks/sosia_colab.ipynb` instala o pacote, gera variantes, lê bios offline, calibra/valida os conectores no seu IP, varre, mostra o relatório e baixa o pacote de evidências. Células com 🌐 usam rede. O link do badge aponta para a branch de desenvolvimento; ajuste para `main` após o merge.
+> **Dois Colabs independentes:** [**Máquina 1 · análise e CLI**](notebooks/sosia_colab.ipynb) mantém o roteiro passo a passo, com **download seletivo de PDF, HTML, CSV, JSON, JSONL, Markdown, STIX e ZIP**. [**Máquina 2 · frontend visual**](notebooks/sosia_frontend_colab.ipynb) oferece interface Gradio com geração de variantes, leitura de bio e varredura autorizada. O frontend exige senha quando compartilhado pelo Colab. Veja [como escolher seu ambiente](docs/EXPORTS.md).
 
 ---
 
@@ -87,6 +88,37 @@ Para quem prefere aprender por exemplo: [4 cenários documentados com comandos o
 | Bio diz "perfil de fãs, não oficial" | "Copia a marca" | **Mitigador**: exige análise contextual |
 | Bio alega ser suporte e solicita pagamento | "Fraude confirmada" | **Sinais para investigação**: confirmar existência, vínculo, contexto e evidência |
 
+## Configure sua investigação: entenda cada campo
+
+Os formulários dos Colabs pedem cinco entradas. Elas **não são equivalentes**: cada uma modifica uma etapa diferente da geração ou da triagem.
+
+| Campo mostrado | O que informar | Por que isso importa? | Exemplo fictício |
+|---|---|---|---|
+| **BRAND** | Nome público da marca/pessoa representada | Referência para bio, relatórios e nomes de exibição; não é o username-base | `Marca Zeta` |
+| **HANDLE** | Username-base **sem @** | Ponto de partida do gerador de variantes e da métrica de semelhança | `marcazeta` |
+| **DOMAINS** | Domínios legítimos separados por vírgulas, **sem https://** | Ajuda a distinguir links conhecidos, semelhantes e externos; **linkar um site não comprova vínculo** | `marcazeta.com.br` |
+| **OFFICIAL** | Usernames de contas comprovadamente oficiais | **Allowlist**: não tratar as próprias contas como suspeitas. Nunca inclua um perfil apenas porque ele afirma ser oficial | `marcazeta, marcazeta_sac` |
+| **EXTRA_AFFIXES** | Palavras específicas do setor, separadas por vírgulas | Amplia as famílias de candidatos com termos plausíveis, como "clube" ou "cartão"; não é uma lista de contas oficiais | `clube, cartao` |
+
+**Atenção:** o campo OFFICIAL nos Colabs é **global para todas as plataformas**. Para especificar um canal oficial somente no Instagram, X etc., use a seção `[official]` por plataforma no `sosia.toml`. Um erro nessa allowlist pode esconder um perfil que deveria ser investigado.
+
+**Leia a documentação detalhada, com exemplos e erros frequentes:** [**Guia de configuração dos cinco campos**](docs/CONFIGURATION.md).
+
+### Duas máquinas Colab: escolha como trabalhar
+
+| | Máquina 1 · Análise / CLI | Máquina 2 · Frontend |
+|---|---|---|
+| **Abrir** | [▶ Colab principal](notebooks/sosia_colab.ipynb) | [▶ Colab visual](notebooks/sosia_frontend_colab.ipynb) |
+| **Experiência** | Notebook passo a passo, funções Python e evidências | Gradio, formulários, abas, painéis e tabelas |
+| **Variantes e bios** | Offline | Offline |
+| **Consultas públicas** | Células de calibração e varredura | Aba de varredura, exigindo confirmação |
+| **Exportação** | Checkboxes por formato + ZIP ou arquivos individuais | Checkboxes e ZIP selecionado, HTML/PDF separados |
+| **Relatórios** | HTML, PDF, Markdown, JSON/JSONL, CSV, STIX | HTML, PDF, Markdown, JSON/JSONL, CSV, STIX |
+| **Acesso** | Dentro do seu Colab | Link temporário **com senha obrigatória** |
+
+**Para relatórios offline já existentes:** `sosia.exports.export_reports` gera HTML com a biblioteca padrão e PDF com o ReportLab **opcional**. O núcleo continua sem dependências externas obrigatórias. Consulte [Exportações e downloads](docs/EXPORTS.md).
+
+
 ## Comece aqui
 
 **Pré-requisitos:** Python 3.11+ e Git. O motor não exige dependências Python adicionais em tempo de execução.
@@ -103,6 +135,8 @@ sosia init                            # cria sosia.toml
 ```
 
 Edite `sosia.toml` para definir uma **marca sob sua responsabilidade**, seus canais oficiais e domínios permitidos antes de iniciar a varredura real.
+
+Para ver o papel exato de BRAND, HANDLE, DOMAINS, OFFICIAL e EXTRA_AFFIXES e as diferenças entre allowlist global e por plataforma: **[guia de configuração](docs/CONFIGURATION.md)**.
 
 ```bash
 # Sem rede: explorar o gerador com marca fictícia
