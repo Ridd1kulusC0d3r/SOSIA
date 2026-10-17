@@ -15,3 +15,33 @@ jobs:
         run: PYTHONPATH=src python -m unittest discover -s tests -v
       - name: Bench rápido (determinístico)
         run: PYTHONPATH=src python -m sosia bench --quick > /dev/null
+
+  pdf-export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install optional PDF dependency
+        run: python -m pip install "reportlab>=4"
+      - name: Test PDF, HTML and frontend input handling
+        run: PYTHONPATH=src python -m unittest discover -s tests -p "test_exports.py" -v
+
+  frontend-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install optional Gradio frontend
+        run: python -m pip install "gradio>=5,<7"
+      - name: Build Gradio interface offline
+        run: |
+          PYTHONPATH=src python - <<'PY'
+          from sosia.webapp import create_app
+          app = create_app()
+          assert len(app.blocks) > 10, "Interface incompleta"
+          print("Frontend Gradio construído com", len(app.blocks), "componentes.")
+          PY
