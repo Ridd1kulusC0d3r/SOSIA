@@ -54,10 +54,11 @@ class UrlLibFetcher:
     """
 
     def __init__(self, *, user_agent: str = DEFAULT_UA, timeout: float = 12.0, min_interval: float = 1.0,
-                 retries: int = 1, max_retry_wait: float = 20.0) -> None:
+                 retries: int = 1, max_retry_wait: float = 20.0, host_intervals: dict[str, float] | None = None) -> None:
         self.user_agent = user_agent
         self.timeout = timeout
         self.min_interval = min_interval
+        self.host_intervals = host_intervals or {}   # intervalo por host (ex.: mastodon.social limita a ~300 req/5 min)
         self.retries = retries
         self.max_retry_wait = max_retry_wait
         self._next: dict[str, float] = {}
@@ -68,7 +69,7 @@ class UrlLibFetcher:
         with self._lock:
             now = time.monotonic()
             t = max(now, self._next.get(host, 0.0))
-            self._next[host] = t + self.min_interval
+            self._next[host] = t + self.host_intervals.get(host, self.min_interval)
         if t > now:
             time.sleep(t - now)
 

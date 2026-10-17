@@ -79,3 +79,19 @@ Limite: ainda não compara avatar/logo (pHash exigiria decodificar imagens; fora
 ## 8. Não-objetivos
 
 Contornar login/CAPTCHA/WAF, rotação de IP/UA, scraping autenticado, coleta em massa de pessoas, automação de denúncia sem revisão humana.
+
+
+## 9. O que o bench real derrubou (2026-10-17)
+
+Detalhes e números em [`REAL_BENCH.md`](REAL_BENCH.md). Resumo das decisões que mudaram:
+
+- **Abuso forte sem relação com a marca não é alerta** (era ALTO em 486/504 casos reais). Agora BAIXO, com razão explícita.
+- **`lookalike_link` deixou de ser evidência dura**; `sibling_tld` (mesmo rótulo, outro TLD) é neutro.
+- **"Oficial/atendimento" sem abuso ⇒ MÉDIO** (era ALTO; ~25/26 eram entidades legítimas).
+- **Semelhança de handle sozinha ⇒ BAIXO** (lista, não fila); MÉDIO exige algo específico (alegação, desvio de canal, confundível visual).
+- **Menção à marca na bio é contexto, não identidade**: ALTO por abuso moderado exige semelhança ≥ 0,7; CRÍTICO ≥ 0,6.
+- **Descoberta por busca (`sosia discover`)** passa a ser o caminho principal para *listar* candidatas; a enumeração fica para checagem direta e confundíveis.
+- Preço: no bench sintético, recall de CRÍTICO 42% → 31%. Sem positivos reais, não sei qual lado do trade-off é o certo.
+
+**Lição de processo.** Cada correção foi ditada pelo conjunto de dados que a expôs, então aquele conjunto deixa de ser teste. Por isso há 5 conjuntos
+disjuntos, e só o último (#4, regras congeladas) é limpo. Mesmo ele só mede *carga de alertas*, não detecção.

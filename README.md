@@ -139,7 +139,9 @@ sosia scan -c sosia.toml --out runs/minha-marca --format summary
 | `sosia stix DIR/case.json` | Não | Ler o STIX produzido no pacote |
 | `sosia fit-priors HANDLE aliases.txt` | Não | Recalibrar massa das famílias com aliases conhecidos |
 | `sosia eval exemplos.jsonl` | Não | Avaliar triagem contra rótulos revisados |
+| `sosia discover MARCA` | Sim | **Descoberta por busca nativa** (Bluesky/Mastodon) + indicador de saturação/ambiguidade da marca |
 | `sosia bench [--quick]` | Não | Rodar regressões em ambiente **sintético** |
+| `sosia bench-real` | Sim | Bench com dados/oráculos **reais** (cache local; texto de terceiros não é versionado) |
 
 `watch` usa os mesmos códigos de saída para eventos; não atualiza o estado se nenhum conector estiver utilizável (evita falso “perfil removido”). Exemplo agendado: [`examples/watch-workflow.yml`](examples/watch-workflow.yml).
 
@@ -209,25 +211,30 @@ Mais detalhes, comandos e perguntas investigativas: **[Guia de cenários](exampl
 | **Soft-404 diferencial** | Comparação de corpo com controles, **somente quando passa na validação** |
 | **Canário durante scan** | Verifica drift, CAPTCHA e mudança de resposta; degrada conector quando necessário |
 | **Léxico de fraude contextual** | Grupos de sinal, negação, ofuscação, alegação de identidade, mitigadores e alavancas de engenharia social |
-| **Condição para CRÍTICO** | Múltiplos indícios independentes ou grupo forte + identidade alegada, bio lida, marca citada, existência confirmada, sem disclaimer nem allowlist |
+| **Condição para CRÍTICO** | Múltiplos indícios independentes ou grupo forte + identidade alegada, bio lida, **handle/nome parecido com a marca (≥ 0,6; menção na bio não basta)**, existência confirmada, sem disclaimer nem allowlist |
 | **Evidências** | `case.json`, `report.md`, CSV, STIX 2.1, `evidence/`, `MANIFEST.sha256` |
 | **Integração com pipelines** | `--format json/jsonl/md/summary` e códigos de saída adequados a automações defensivas |
 
 ## Resultados e validação
 
-Os benchmarks existentes medem **um cenário sintético**, não precisão real do produto em redes sociais. A separação é intencional.
+> **Leia isto antes de citar qualquer número.** Há dois tipos de bench com resultados *opostos*, e **nenhum mede o recall real** do produto.
 
-| Experimento reproduzível | Resultado reportado | Ressalva |
+**Bench real** ([`docs/REAL_BENCH.md`](docs/REAL_BENCH.md)) — 139 marcas sorteadas da lista Tranco, 5.327 contas devolvidas pela busca do Bluesky/Mastodon, oráculos independentes de existência e um corpus de spam rotulado por terceiros:
+
+| Pergunta | Resultado real | Leitura crítica |
 |---|---|---|
-| Descoberta de aliases com orçamento 200 | SÓSIA: **24,1%**; baseline tipo-dnstwist: **14,8%**; tipo-Sherlock: **2,6%** | Baselines reproduzem a lógica, não executam as ferramentas; afixos desconhecidos têm cobertura muito baixa |
-| Confirmação em 12 plataformas simuladas | Estratégia HTTP ingênua: **8.298 falsos positivos**; SÓSIA: **0 falsos positivos** e **1.255 existentes inconclusivos** | Apenas mundos simulados, com cenários projetados para avaliar falhas conhecidas |
-| Prioridade CRÍTICO vs golpe, split sintético de teste | **Precisão 100% / recall 42%** | Precisão otimista por conhecimento prévio do corpus; 58% dos golpes do split ficaram fora da classe CRÍTICO |
+| A enumeração de variantes acha o que a busca da plataforma associa à marca? | **2–3%** dos handles que contêm a marca (SÓSIA); ~1% (tipo-dnstwist); 0% (tipo-Sherlock) | O bench sintético prometia 24%. Para **listar candidatos**, use `sosia discover` (busca nativa) |
+| Quantos alertas ≥ALTO nas 5.327 contas reais, com as regras finais? | **7 (0,13%)**, **todos falsos positivos** (colisão de nome de marca comum) | Antes das correções: 504 ALTO num conjunto, precisão ≲ 10% nos sinalizados. Carga baixa **não prova** boa detecção: só ~1 caso genuinamente suspeito apareceu nos dados |
+| Em conjunto **inédito** (27 marcas, 708 contas, regras congeladas)? | 0 CRÍTICO, 0 ALTO, 9 MÉDIO | Idem: compatível com detector bom *e* com detector cego |
+| A camada de linguagem detecta spam real de terceiros (UCI SMS Spam)? | recall **13% (pt-MT)**, **2% (en)**, nível "forte" **1,3%**; falsos positivos 0–0,6% | Domínio diferente (SMS), mas mostra léxico estreito e escrito à mão |
+| O conector acerta a existência? | Validado ao vivo em 11/17 plataformas (perfis conhecidos + negativos novos); R2 compara com oráculos independentes | Ver `REAL_BENCH.md` §6 |
 
-Em uma validação pontual de conectores de **15/10/2026**, 11 de 17 foram utilizáveis e passaram nos controles no ambiente testado, 3 foram bloqueados, 2 deram soft-404 e 1 foi instável. Esse resultado **não é uma certificação de plataformas** e pode mudar de acordo com IP e região.
+**Bench sintético** ([`docs/BENCH_RESULTS.md`](docs/BENCH_RESULTS.md)) — harness de regressão com verdade-terreno simulada pelo próprio autor. Útil para provar que o motor não cai em modos de falha conhecidos (soft-404, shell de SPA, CAPTCHA, drift…): a estratégia HTTP ingênua teve **8.298 falsos positivos** e **222 falsos negativos silenciosos**; o SÓSIA teve **0 e 0**, deixando **1.255 existentes inconclusivos**. **Não** use os números de triagem/descoberta dele como desempenho de campo: depois das correções guiadas pelo bench real, o recall de CRÍTICO no split sintético de teste caiu de 42% para **31%**, e o de ≥ALTO de 76% para **23%** — o preço de parar de gerar falsos alertas em dados reais.
 
-Leia os dados, metodologia e limites antes de utilizar os números:
+Validação pontual de conectores em **15/10/2026**: 11 de 17 utilizáveis, 3 bloqueados, 2 soft-404, 1 instável — **não é certificação** e muda com IP e região.
 
-- [Benchmark completo e reprodução](docs/BENCH_RESULTS.md)
+- [Bench real: método, resultados e o que desmentiu](docs/REAL_BENCH.md)
+- [Bench sintético e reprodução](docs/BENCH_RESULTS.md)
 - [Validação ao vivo e saída bruta](docs/LIVE_VALIDATION.md)
 - [Decisões de engenharia e falhas descobertas](docs/DESIGN.md)
 
@@ -236,6 +243,9 @@ Leia os dados, metodologia e limites antes de utilizar os números:
 - A descoberta por username não encontra automaticamente clones com nome/avatar iguais e **handle totalmente diferente**. `pivots` ajuda a gerar consultas, mas não resolve o problema.
 - Instagram, Facebook e outras plataformas com barreiras podem ficar inconclusivas. O projeto não burla login, CAPTCHA, rate limit ou WAF.
 - O modo diferencial tem confiança menor e não basta, por si só, para elevar a prioridade a CRÍTICO.
+- **Recall real é desconhecido.** Não há (ainda) corpus real de impersonadores rotulados; o bench real só mediu carga de alertas e precisão dos sinalizados.
+- **Marcas que são palavras comuns** (`washington`, `privacy`, `stone`… ≈12% das sorteadas) geram quase só colisão de nome. Use `sosia discover` para medir a saturação e `ambiguous = true`; só evidência fora do texto (domínio verificado, telefone, imagem) sustenta alerta nessas marcas.
+- O léxico de golpe é pt-BR escrito à mão; contra spam de terceiros (UCI SMS) detectou 13% (pt, tradução automática), 2% (en).
 - Os priors e pesos iniciais são hipóteses, não estatísticas de campo. `fit-priors` e `eval` ajudam a examinar essa lacuna.
 - Links para um domínio oficial na bio **não provam** que o perfil é oficialmente vinculado à marca; é necessário verificar a reciprocidade.
 - Não há UI de produção: a interface em HTML é exclusivamente um laboratório demonstrativo.

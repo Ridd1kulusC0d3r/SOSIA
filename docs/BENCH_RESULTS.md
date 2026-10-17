@@ -1,4 +1,4 @@
-# SÓSIA Bench — resultados (SINTÉTICOS)
+# SÓSIA Bench — resultados (SINTÉTICOS) — regras pós-bench-real
 
 > **Isto é um harness de regressão com verdade-terreno simulada.** Os números mostram como o motor se comporta frente a modos de falha conhecidos (soft-404, shell de SPA, login wall, rate limit, CAPTCHA, drift) e a um atacante simulado independente do gerador. **Não são taxas de detecção do mundo real**, e os baselines são reimplementações mínimas da lógica *documentada* de Sherlock/dnstwist/Maigret — essas ferramentas não foram executadas.
 
@@ -107,13 +107,13 @@ Aliases existentes (exceto `unrelated`, que a enumeração não acha). Verdade: 
 |---|---|---|---|---|---|---|---|---|---|---|
 | dev | handle_only | 16 | 27 | 71 | 37.2% | 18.4% | 24.6% | 52.9% | 79.3% | {'fan': 12, 'benign': 6, 'reseller': 6, 'nonscam': 3} |
 | dev | bio_keyword_v1.1 | 87 | 67 | 0 | 56.5% | 100.0% | 72.2% | 67.8% | 26.0% | {'benign': 15, 'nonscam': 20, 'reseller': 18, 'fan': 14} |
-| dev | sosia_multisignal | 66 | 0 | 21 | 100.0% | 75.9% | 86.3% | 89.9% | 68.3% | — |
+| dev | sosia_multisignal | 56 | 0 | 31 | 100.0% | 64.4% | 78.3% | 85.1% | 73.1% | — |
 | test | handle_only | 17 | 42 | 83 | 28.8% | 17.0% | 21.4% | 58.1% | 80.2% | {'reseller': 9, 'benign': 15, 'nonscam': 5, 'fan': 13} |
 | test | bio_keyword_v1.1 | 100 | 94 | 0 | 51.5% | 100.0% | 68.0% | 68.5% | 34.9% | {'reseller': 35, 'nonscam': 17, 'fan': 24, 'benign': 18} |
-| test | sosia_multisignal | 42 | 0 | 58 | 100.0% | 42.0% | 59.2% | 80.5% | 85.9% | — |
+| test | sosia_multisignal | 31 | 0 | 69 | 100.0% | 31.0% | 47.3% | 76.8% | 89.6% | — |
 | all | handle_only | 33 | 69 | 154 | 32.4% | 17.6% | 22.8% | 55.9% | 79.8% | {'fan': 25, 'benign': 21, 'reseller': 15, 'nonscam': 8} |
 | all | bio_keyword_v1.1 | 187 | 161 | 0 | 53.7% | 100.0% | 69.9% | 68.2% | 31.2% | {'benign': 33, 'nonscam': 37, 'reseller': 53, 'fan': 38} |
-| all | sosia_multisignal | 108 | 0 | 79 | 100.0% | 57.8% | 73.2% | 84.4% | 78.7% | — |
+| all | sosia_multisignal | 87 | 0 | 100 | 100.0% | 46.5% | 63.5% | 80.2% | 82.8% | — |
 
 ### ≥ALTO vs (golpe ∪ impersonação)
 
@@ -121,22 +121,22 @@ Aliases existentes (exceto `unrelated`, que a enumeração não acha). Verdade: 
 |---|---|---|---|---|---|---|---|---|---|---|
 | dev | handle_only | 95 | 89 | 13 | 51.6% | 88.0% | 65.1% | 51.0% | 11.5% | {'benign': 30, 'fan': 36, 'reseller': 23} |
 | dev | bio_keyword_v1.1 | 108 | 93 | 0 | 53.7% | 100.0% | 69.9% | 55.3% | 3.4% | {'benign': 32, 'fan': 38, 'reseller': 23} |
-| dev | sosia_multisignal | 92 | 0 | 16 | 100.0% | 85.2% | 92.0% | 92.3% | 55.8% | — |
+| dev | sosia_multisignal | 56 | 0 | 52 | 100.0% | 51.9% | 68.3% | 75.0% | 73.1% | — |
 | test | handle_only | 113 | 147 | 21 | 43.5% | 84.3% | 57.4% | 43.6% | 12.8% | {'reseller': 39, 'benign': 46, 'fan': 62} |
 | test | bio_keyword_v1.1 | 131 | 154 | 3 | 46.0% | 97.8% | 62.5% | 47.3% | 4.4% | {'reseller': 42, 'benign': 49, 'fan': 63} |
-| test | sosia_multisignal | 102 | 0 | 32 | 100.0% | 76.1% | 86.4% | 89.3% | 65.8% | — |
+| test | sosia_multisignal | 31 | 0 | 103 | 100.0% | 23.1% | 37.6% | 65.4% | 89.6% | — |
 | all | handle_only | 208 | 236 | 34 | 46.8% | 86.0% | 60.6% | 46.6% | 12.3% | {'benign': 76, 'fan': 98, 'reseller': 62} |
 | all | bio_keyword_v1.1 | 239 | 247 | 3 | 49.2% | 98.8% | 65.7% | 50.6% | 4.0% | {'benign': 81, 'fan': 101, 'reseller': 65} |
-| all | sosia_multisignal | 194 | 0 | 48 | 100.0% | 80.2% | 89.0% | 90.5% | 61.7% | — |
+| all | sosia_multisignal | 87 | 0 | 155 | 100.0% | 36.0% | 52.9% | 69.4% | 82.8% | — |
 
 ### Matriz de confusão do SÓSIA (papel verdadeiro × prioridade) — split test
 
 | papel | CRITICO | ALTO | MEDIO | BAIXO | INFO |
 |---|---|---|---|---|---|
-| benign | 0 | 0 | 29 | 25 | 1 |
-| fan | 0 | 0 | 32 | 35 | 0 |
-| nonscam | 0 | 17 | 17 | 0 | 0 |
-| reseller | 0 | 0 | 42 | 0 | 0 |
-| scam | 42 | 43 | 15 | 0 | 0 |
+| benign | 0 | 0 | 26 | 28 | 1 |
+| fan | 0 | 0 | 25 | 42 | 0 |
+| nonscam | 0 | 0 | 17 | 17 | 0 |
+| reseller | 0 | 0 | 35 | 7 | 0 |
+| scam | 31 | 0 | 69 | 0 | 0 |
 
 > Acurácia isolada engana: com maioria de perfis não acionáveis, um classificador que nunca alerta já tem a acurácia da coluna "tudo negativo" e detecta zero golpes. Use precisão/recall por classe.

@@ -281,3 +281,30 @@ class WatchTests(unittest.TestCase):
         from sosia.watch import compute_events
         a = self.case("Perfil oficial Marca Zeta, novidades.")
         self.assertEqual(compute_events(a, json.loads(json.dumps(a))), [])
+
+
+class DiscoveryTests(unittest.TestCase):
+    class Fake:
+        def __init__(self, n_contains):
+            self.n = n_contains
+
+        def get(self, url, headers=None):
+            from sosia.net import Response
+            if "searchActors" in url:
+                acts = [{"handle": f"zeta{i}.bsky.social", "displayName": f"Zeta {i}", "description": "oi"} for i in range(self.n)]
+                acts += [{"handle": "joao.bsky.social", "displayName": "Joao", "description": "x"},
+                         {"handle": "zeta.com.br", "displayName": "Zeta", "description": "oficial"}]
+                return Response(url, 200, url, {}, json.dumps({"actors": acts}).encode())
+            return Response(url, 200, url, {}, json.dumps({"accounts": []}).encode())
+
+    def test_discover_classifies_and_flags_saturation(self):
+        from sosia.discovery import discover, estimate_ambiguity, handle_class, local_part
+        accs = discover("zeta", self.Fake(5), ())
+        classes = [handle_class("zeta", local_part(a)) if local_part(a) else "custom_domain" for a in accs]
+        self.assertEqual(classes.count("contains"), 5)
+        self.assertIn("custom_domain", classes)
+        self.assertIn("unrelated", classes)
+        self.assertFalse(estimate_ambiguity("zeta", accs)["saturated"])
+        big = estimate_ambiguity("zeta", discover("zeta", self.Fake(60), ()))
+        self.assertTrue(big["saturated"])
+        self.assertIn("ambiguous = true", big["advice"])

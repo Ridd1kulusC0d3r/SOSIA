@@ -47,8 +47,10 @@ NEGATORS = re.compile(r"\b(nunca|jamais|nao|never|not|sem|dont|don t|do not|nada
 NEGATION_WINDOW = 40
 
 # grupos "duros": sozinhos já indicam tentativa de obter dinheiro/credencial/transferir ao golpista
-HARD_GROUPS = {"financial_ask", "credential_ask", "lookalike_link", "reward_lure", "invest_lure"}
-SOFT_GROUPS = {"channel_shift", "urgency", "fear", "link_risk", "social_proof"}
+# lookalike_link saiu de HARD: no bench real (hold-out) 0/14 domínios "parecidos" eram impersonação (domínios irmãos,
+# podcasts, sites de fãs, produtos homônimos). Continua sinal, mas não sustenta CRÍTICO sozinho.
+HARD_GROUPS = {"financial_ask", "credential_ask", "reward_lure", "invest_lure"}
+SOFT_GROUPS = {"channel_shift", "urgency", "fear", "link_risk", "social_proof", "lookalike_link"}
 
 LEVERS = ("authority", "urgency", "scarcity", "reward", "fear", "social_proof", "isolation", "commitment")
 

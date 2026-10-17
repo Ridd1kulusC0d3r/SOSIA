@@ -37,6 +37,7 @@ class Brand:
     domains: list[str] = field(default_factory=list)
     official: dict[str, set[str]] = field(default_factory=dict)  # plataforma|"*" -> handles autorizados
     extra_affixes: list[str] = field(default_factory=list)
+    ambiguous: bool = False   # a marca é palavra comum (washington, privacy…): limita a prioridade a ALTO
 
     @property
     def names(self) -> list[str]:

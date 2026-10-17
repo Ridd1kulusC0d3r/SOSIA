@@ -1,0 +1,455 @@
+{
+ "date": "2026-10-17",
+ "method": "docs/REAL_BENCH.md",
+ "note": "somente agregados; nenhum handle/bio de terceiros",
+ "brand_sets": {
+  "dev": {
+   "brands": 31,
+   "accounts": 852,
+   "with_bio": 644,
+   "distribution": {
+    "BAIXO": 343,
+    "INFO": 505,
+    "MEDIO": 4
+   }
+  },
+  "holdout1": {
+   "brands": 27,
+   "accounts": 1374,
+   "with_bio": 1103,
+   "distribution": {
+    "BAIXO": 822,
+    "INFO": 475,
+    "MEDIO": 70,
+    "ALTO": 4,
+    "CRITICO": 3
+   }
+  },
+  "holdout2": {
+   "brands": 27,
+   "accounts": 1455,
+   "with_bio": 1190,
+   "distribution": {
+    "INFO": 415,
+    "BAIXO": 1022,
+    "MEDIO": 18
+   }
+  },
+  "holdout3": {
+   "brands": 27,
+   "accounts": 938,
+   "with_bio": 729,
+   "distribution": {
+    "INFO": 265,
+    "BAIXO": 655,
+    "MEDIO": 18
+   }
+  },
+  "holdout4": {
+   "brands": 27,
+   "accounts": 708,
+   "with_bio": 488,
+   "distribution": {
+    "INFO": 291,
+    "BAIXO": 408,
+    "MEDIO": 9
+   }
+  }
+ },
+ "r1_pooled": {
+  "n_brands": 139,
+  "saturated_brands": [
+   "alelo",
+   "alura",
+   "amplify",
+   "bling",
+   "blockchain",
+   "bumble",
+   "caliente",
+   "charter",
+   "costco",
+   "garmin",
+   "mcdonalds",
+   "penso",
+   "privacy",
+   "safra",
+   "stone",
+   "thunderbird",
+   "virtua"
+  ],
+  "classes": {
+   "contains": 2251,
+   "exact": 168,
+   "unrelated": 2584,
+   "custom_domain": 314,
+   "similar": 10
+  },
+  "recall_pooled": {
+   "sherlock_like": {
+    "50": {
+     "hit": 0,
+     "n": 2261,
+     "ci": "0.0% [0.0–0.2] (n=2261)"
+    },
+    "200": {
+     "hit": 0,
+     "n": 2261,
+     "ci": "0.0% [0.0–0.2] (n=2261)"
+    },
+    "800": {
+     "hit": 0,
+     "n": 2261,
+     "ci": "0.0% [0.0–0.2] (n=2261)"
+    },
+    "all": {
+     "hit": 0,
+     "n": 2261,
+     "ci": "0.0% [0.0–0.2] (n=2261)"
+    }
+   },
+   "dnstwist_like": {
+    "50": {
+     "hit": 8,
+     "n": 2261,
+     "ci": "0.4% [0.2–0.7] (n=2261)"
+    },
+    "200": {
+     "hit": 22,
+     "n": 2261,
+     "ci": "1.0% [0.6–1.5] (n=2261)"
+    },
+    "800": {
+     "hit": 22,
+     "n": 2261,
+     "ci": "1.0% [0.6–1.5] (n=2261)"
+    },
+    "all": {
+     "hit": 22,
+     "n": 2261,
+     "ci": "1.0% [0.6–1.5] (n=2261)"
+    }
+   },
+   "sosia": {
+    "50": {
+     "hit": 10,
+     "n": 2261,
+     "ci": "0.4% [0.2–0.8] (n=2261)"
+    },
+    "200": {
+     "hit": 46,
+     "n": 2261,
+     "ci": "2.0% [1.5–2.7] (n=2261)"
+    },
+    "800": {
+     "hit": 74,
+     "n": 2261,
+     "ci": "3.3% [2.6–4.1] (n=2261)"
+    },
+    "all": {
+     "hit": 74,
+     "n": 2261,
+     "ci": "3.3% [2.6–4.1] (n=2261)"
+    }
+   }
+  },
+  "recall_pooled_excluding_saturated": {
+   "sherlock_like": {
+    "50": {
+     "hit": 0,
+     "n": 375,
+     "ci": "0.0% [0.0–1.0] (n=375)"
+    },
+    "200": {
+     "hit": 0,
+     "n": 375,
+     "ci": "0.0% [0.0–1.0] (n=375)"
+    },
+    "800": {
+     "hit": 0,
+     "n": 375,
+     "ci": "0.0% [0.0–1.0] (n=375)"
+    },
+    "all": {
+     "hit": 0,
+     "n": 375,
+     "ci": "0.0% [0.0–1.0] (n=375)"
+    }
+   },
+   "dnstwist_like": {
+    "50": {
+     "hit": 1,
+     "n": 375,
+     "ci": "0.3% [0.0–1.5] (n=375)"
+    },
+    "200": {
+     "hit": 3,
+     "n": 375,
+     "ci": "0.8% [0.3–2.3] (n=375)"
+    },
+    "800": {
+     "hit": 3,
+     "n": 375,
+     "ci": "0.8% [0.3–2.3] (n=375)"
+    },
+    "all": {
+     "hit": 3,
+     "n": 375,
+     "ci": "0.8% [0.3–2.3] (n=375)"
+    }
+   },
+   "sosia": {
+    "50": {
+     "hit": 2,
+     "n": 375,
+     "ci": "0.5% [0.1–1.9] (n=375)"
+    },
+    "200": {
+     "hit": 11,
+     "n": 375,
+     "ci": "2.9% [1.6–5.2] (n=375)"
+    },
+    "800": {
+     "hit": 19,
+     "n": 375,
+     "ci": "5.1% [3.3–7.8] (n=375)"
+    },
+    "all": {
+     "hit": 19,
+     "n": 375,
+     "ci": "5.1% [3.3–7.8] (n=375)"
+    }
+   }
+  }
+ },
+ "r2": {
+  "mastodon": {
+   "candidates": 253,
+   "oracle_exists": 8,
+   "oracle_missing": 245,
+   "states": {
+    "trusted": 31
+   },
+   "sosia": {
+    "tp": 8,
+    "fp": 0,
+    "fn_silent": 0,
+    "inconclusive": 0,
+    "inconclusive_of_existing": 0,
+    "recall": "100.0% [67.6–100.0] (n=8)",
+    "false_positive_rate": "0.0% [0.0–1.5] (n=245)",
+    "precision": "100.0% [67.6–100.0] (n=8)"
+   },
+   "unprobed_candidates": 0,
+   "oracle_errors": 1,
+   "naive_page_status": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0,
+    "recall": "100.0% [67.6–100.0] (n=8)",
+    "false_positive_rate": "0.0% [0.0–1.5] (n=245)",
+    "precision": "100.0% [67.6–100.0] (n=8)"
+   }
+  },
+  "devto": {
+   "candidates": 930,
+   "oracle_exists": 6,
+   "oracle_missing": 924,
+   "states": {
+    "trusted": 31
+   },
+   "sosia": {
+    "tp": 6,
+    "fp": 0,
+    "fn_silent": 0,
+    "inconclusive": 0,
+    "inconclusive_of_existing": 0,
+    "recall": "100.0% [61.0–100.0] (n=6)",
+    "false_positive_rate": "0.0% [0.0–0.4] (n=924)",
+    "precision": "100.0% [61.0–100.0] (n=6)"
+   },
+   "unprobed_candidates": 0,
+   "oracle_errors": 0
+  },
+  "gitlab": {
+   "candidates": 31,
+   "oracle_exists": 31,
+   "oracle_missing": 0,
+   "states": {
+    "trusted": 31
+   },
+   "sosia": {
+    "tp": 25,
+    "fp": 0,
+    "fn_silent": 6,
+    "inconclusive": 0,
+    "inconclusive_of_existing": 0,
+    "recall": "80.6% [63.7–90.8] (n=31)",
+    "false_positive_rate": "n/a",
+    "precision": "100.0% [86.7–100.0] (n=25)"
+   },
+   "unprobed_candidates": 0,
+   "oracle_errors": 899,
+   "status": "oracle invalid (403 on 882/931 page requests)"
+  },
+  "bluesky": {
+   "candidates": 1063,
+   "oracle_exists": 114,
+   "oracle_missing": 949,
+   "states": {
+    "trusted": 31
+   },
+   "sosia": {
+    "tp": 108,
+    "fp": 0,
+    "fn_silent": 4,
+    "inconclusive": 15,
+    "inconclusive_of_existing": 2,
+    "recall": "94.7% [89.0–97.6] (n=114)",
+    "false_positive_rate": "0.0% [0.0–0.4] (n=949)",
+    "precision": "100.0% [96.6–100.0] (n=108)"
+   },
+   "unprobed_candidates": 0,
+   "oracle_errors": 177,
+   "naive_page_status": {
+    "tp": 114,
+    "fp": 949,
+    "fn": 0,
+    "recall": "100.0% [96.7–100.0] (n=114)",
+    "false_positive_rate": "100.0% [99.6–100.0] (n=949)",
+    "precision": "10.7% [9.0–12.7] (n=1063)"
+   }
+  },
+  "bluesky_page_differential": {
+   "state": "differential",
+   "validation": "2/2 known, 6/6 random",
+   "candidates": 1063,
+   "exist": 114,
+   "missing": 949,
+   "recall": "96.5% [91.3-98.6]",
+   "false_positive_rate": "0.0% [0.0-0.4]",
+   "inconclusive": 0,
+   "fn_silent": 4
+  }
+ },
+ "r4": {
+  "n": 5572,
+  "spam": 747,
+  "ham": 4825,
+  "langs": {
+   "en": {
+    "sosia_any_signal": {
+     "recall": "2.3% [1.4–3.6] (n=747)",
+     "false_positive_rate": "0.2% [0.1–0.3] (n=4825)",
+     "precision": "68.0% [48.4–82.8] (n=25)",
+     "tp": 17,
+     "fp": 8,
+     "fn": 730,
+     "tn": 4817
+    },
+    "sosia_moderate_plus": {
+     "recall": "0.9% [0.5–1.9] (n=747)",
+     "false_positive_rate": "0.1% [0.1–0.3] (n=4825)",
+     "precision": "53.8% [29.1–76.8] (n=13)",
+     "tp": 7,
+     "fp": 6,
+     "fn": 740,
+     "tn": 4819
+    },
+    "sosia_strong": {
+     "recall": "0.0% [0.0–0.5] (n=747)",
+     "false_positive_rate": "0.0% [0.0–0.1] (n=4825)",
+     "precision": "n/a",
+     "tp": 0,
+     "fp": 0,
+     "fn": 747,
+     "tn": 4825
+    },
+    "keyword_baseline": {
+     "recall": "1.5% [0.8–2.6] (n=747)",
+     "false_positive_rate": "0.5% [0.3–0.7] (n=4825)",
+     "precision": "32.4% [19.1–49.2] (n=34)",
+     "tp": 11,
+     "fp": 23,
+     "fn": 736,
+     "tn": 4802
+    }
+   },
+   "pt": {
+    "sosia_any_signal": {
+     "recall": "13.4% [11.1–16.0] (n=747)",
+     "false_positive_rate": "0.6% [0.4–0.8] (n=4825)",
+     "precision": "78.1% [70.2–84.4] (n=128)",
+     "tp": 100,
+     "fp": 28,
+     "fn": 647,
+     "tn": 4797
+    },
+    "sosia_moderate_plus": {
+     "recall": "7.6% [5.9–9.8] (n=747)",
+     "false_positive_rate": "0.3% [0.2–0.5] (n=4825)",
+     "precision": "81.4% [70.8–88.8] (n=70)",
+     "tp": 57,
+     "fp": 13,
+     "fn": 690,
+     "tn": 4812
+    },
+    "sosia_strong": {
+     "recall": "1.3% [0.7–2.4] (n=747)",
+     "false_positive_rate": "0.0% [0.0–0.1] (n=4825)",
+     "precision": "100.0% [72.2–100.0] (n=10)",
+     "tp": 10,
+     "fp": 0,
+     "fn": 737,
+     "tn": 4825
+    },
+    "keyword_baseline": {
+     "recall": "15.3% [12.9–18.0] (n=747)",
+     "false_positive_rate": "0.5% [0.3–0.7] (n=4825)",
+     "precision": "83.2% [76.1–88.5] (n=137)",
+     "tp": 114,
+     "fp": 23,
+     "fn": 633,
+     "tn": 4802
+    }
+   },
+   "es": {
+    "sosia_any_signal": {
+     "recall": "8.6% [6.8–10.8] (n=747)",
+     "false_positive_rate": "0.3% [0.2–0.5] (n=4825)",
+     "precision": "81.0% [71.0–88.1] (n=79)",
+     "tp": 64,
+     "fp": 15,
+     "fn": 683,
+     "tn": 4810
+    },
+    "sosia_moderate_plus": {
+     "recall": "0.5% [0.2–1.4] (n=747)",
+     "false_positive_rate": "0.2% [0.1–0.3] (n=4825)",
+     "precision": "33.3% [13.8–60.9] (n=12)",
+     "tp": 4,
+     "fp": 8,
+     "fn": 743,
+     "tn": 4817
+    },
+    "sosia_strong": {
+     "recall": "0.0% [0.0–0.5] (n=747)",
+     "false_positive_rate": "0.0% [0.0–0.1] (n=4825)",
+     "precision": "n/a",
+     "tp": 0,
+     "fp": 0,
+     "fn": 747,
+     "tn": 4825
+    },
+    "keyword_baseline": {
+     "recall": "15.3% [12.9–18.0] (n=747)",
+     "false_positive_rate": "0.4% [0.2–0.6] (n=4825)",
+     "precision": "87.0% [80.2–91.7] (n=131)",
+     "tp": 114,
+     "fp": 17,
+     "fn": 633,
+     "tn": 4808
+    }
+   }
+  }
+ }
+}

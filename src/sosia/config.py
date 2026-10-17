@@ -15,6 +15,7 @@ handle = "marcazeta"                 # base para as variantes
 display_names = ["Marca Zeta", "MarcaZeta Brasil"]
 domains = ["marcazeta.com.br"]       # domínios oficiais (link recíproco é a única prova de vínculo)
 extra_affixes = ["clube", "cartao"]  # termos do seu setor para combosquatting
+ambiguous = false                    # true se o nome da marca é palavra comum (limita prioridade a ALTO)
 
 [official]                           # allowlist: nunca são sinalizados
 "*" = ["marcazeta"]
@@ -36,5 +37,6 @@ def load_config(path: str | Path) -> tuple[Brand, dict]:
     official = {k: {h.lower() for h in v} for k, v in data.get("official", {}).items()}
     brand = Brand(name=b["name"], handle=b.get("handle") or slugify(b["name"]),
                   display_names=list(b.get("display_names", [])), domains=list(b.get("domains", [])),
-                  official=official, extra_affixes=list(b.get("extra_affixes", [])))
+                  official=official, extra_affixes=list(b.get("extra_affixes", [])),
+                  ambiguous=bool(b.get("ambiguous", False)))
     return brand, data.get("scan", {})

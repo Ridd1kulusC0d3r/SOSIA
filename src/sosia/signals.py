@@ -54,6 +54,10 @@ def classify_link(link: str, brand: Brand) -> dict:
     else:
         lab = skeleton(_label(reg))
         slug = brand.skeleton_slug
+        if slug and lab == slug:
+            # mesmo rótulo em outro TLD (transfermarkt.de vs .com): em geral é domínio irmão do oficial, não lookalike
+            info["class"] = "sibling_tld"
+            return info
         sim_auth = max((1 - dl_distance(lab, skeleton(_label(registrable(d)))) / max(len(lab), len(skeleton(_label(registrable(d)))), 1)
                         for d in brand.domains), default=0.0)
         if slug and len(slug) >= 4 and slug in lab or sim_auth >= 0.78:

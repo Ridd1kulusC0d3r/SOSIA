@@ -84,7 +84,7 @@ def watch_step(case: dict, state_dir: str | Path) -> tuple[list[dict], bool]:
     latest = sd / "latest.json"
     old = json.loads(latest.read_text(encoding="utf-8")) if latest.exists() else None
     events = compute_events(old, case)
-    ts = _dt.datetime.now(_dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    ts = _dt.datetime.now(_dt.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     payload = json.dumps(case, ensure_ascii=False, indent=2)
     (sd / "history" / f"{ts}.json").write_text(payload, encoding="utf-8")
     tmp = sd / "latest.json.tmp"

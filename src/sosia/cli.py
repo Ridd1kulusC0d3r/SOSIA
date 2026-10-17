@@ -295,6 +295,42 @@ def cmd_eval(a: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_discover(a: argparse.Namespace) -> int:
+    """Descoberta por busca nativa (Bluesky/Mastodon): lista contas com a marca no handle/nome, para triagem."""
+    from .discovery import discover, estimate_ambiguity, handle_class, local_part
+    brand, _ = _brand_from_args(a)
+    f = UrlLibFetcher(user_agent=a.user_agent, min_interval=a.rate if a.rate is not None else 1.2, timeout=a.timeout,
+                      host_intervals={"mastodon.social": 1.2})
+    accounts = discover(brand.slug, f, ())
+    amb = estimate_ambiguity(brand.slug, accounts)
+    _err(f"{amb['accounts_returned']} contas na busca; {amb['handles_containing_brand']} com a marca no handle; "
+         f"{'SATURADA — ' if amb['saturated'] else ''}{amb['advice']}")
+    for acc in accounts:
+        lp = local_part(acc)
+        cls = handle_class(brand.slug, lp) if lp else "custom_domain"
+        if a.only and cls not in a.only.split(","):
+            continue
+        row = {"platform": acc["platform"], "handle": acc["handle"], "class": cls, "display_name": acc.get("display_name")}
+        if a.with_bio:
+            row["bio"] = (acc.get("bio") or "")[:300]
+        print(json.dumps(row, ensure_ascii=False))
+    return EXIT_HIGH if amb["saturated"] and a.fail_if_saturated else EXIT_OK
+
+
+def cmd_bench_real(a: argparse.Namespace) -> int:
+    """Bench com dados e oráculos REAIS (rede). Texto de terceiros fica só no cache local; a saída é agregada."""
+    from .bench.real import run_real
+    stages = tuple(x.strip() for x in a.stages.split(",") if x.strip())
+    res = run_real(a.cache, seed=a.seed, n_global=a.n_global, n_br=a.n_br, exclude=tuple(a.exclude or ()), stages=stages, progress=_err)
+    if a.out:
+        out = Path(a.out)
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "real_bench_results.json").write_text(json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8")
+        _err(f"gravado em {out}/real_bench_results.json")
+    print(json.dumps(res, ensure_ascii=False, indent=2)[:6000])
+    return EXIT_OK
+
+
 def cmd_bench(a: argparse.Namespace) -> int:
     from .bench.runner import render_markdown, run_bench
     res = run_bench(seed=a.seed, quick=a.quick, progress=_err)
@@ -414,6 +450,23 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--show", type=int, default=20, help="quantos erros listar")
     p.add_argument("--json", action="store_true")
     p.set_defaults(fn=cmd_eval)
+
+    p = sub.add_parser("discover", parents=[net], help="descoberta por busca nativa (Bluesky/Mastodon) + indicador de saturação da marca")
+    _common(p)
+    p.add_argument("--only", help="classes separadas por vírgula: exact,contains,similar,unrelated,custom_domain")
+    p.add_argument("--with-bio", action="store_true")
+    p.add_argument("--fail-if-saturated", action="store_true")
+    p.set_defaults(fn=cmd_discover)
+
+    p = sub.add_parser("bench-real", help="bench com dados/oráculos REAIS (rede; lê APIs públicas com cache local)")
+    p.add_argument("--cache", default=".sosia-realbench", help="cache local de respostas (contém texto de terceiros: não versionar)")
+    p.add_argument("--out")
+    p.add_argument("--seed", type=int, default=20261017, help="semente do sorteio de marcas (Tranco)")
+    p.add_argument("--n-global", type=int, default=16)
+    p.add_argument("--n-br", type=int, default=16)
+    p.add_argument("--exclude", action="append", help="rótulo de marca a excluir (declare no relatório; ex.: conteúdo adulto)")
+    p.add_argument("--stages", default="r1,r3,r4", help="r1,r2,r3,r4 (r2 é lento: ~1 h por limites de taxa)")
+    p.set_defaults(fn=cmd_bench_real)
 
     p = sub.add_parser("bench", help="benchmark sintético reproduzível")
     p.add_argument("--seed", type=int, default=7)

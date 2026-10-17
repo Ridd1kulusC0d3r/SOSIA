@@ -298,6 +298,26 @@ class Scoring(unittest.TestCase):
         a = self.prio("marcazeta_pet", "Pet shop da Marcia. Banho e tosa.", name="Marcia Pet")
         self.assertLessEqual(a.priority.rank, Priority.LOW.rank)
 
+    def test_scam_language_unrelated_to_brand_is_not_an_alert(self):
+        # regressão do bench real: host de sorteio / doação via Pix não é impersonação da marca
+        a = self.prio("joana_artes", "Sorteio todo mês! Me chama no WhatsApp. Pix: livepix.gg/joana", name="Joana Artes")
+        self.assertEqual(a.priority, Priority.LOW)
+        self.assertIn("não é impersonação desta marca", " ".join(a.reasons))
+
+    def test_lone_lookalike_domain_is_medium_not_high(self):
+        a = self.prio("marcazeta_news", "Notícias sobre a Marca Zeta em marcazeta-noticias.com", name="Marca Zeta News")
+        self.assertLessEqual(a.priority.rank, Priority.MEDIUM.rank)
+
+    def test_brand_named_only_as_payment_method_is_not_high(self):
+        # regressão do bench real (hold-out #3): "Pix (Nubank)" na bio de uma pessoa
+        a = self.prio("joana_artes", "Ilustradora. Pix: 123.456 (Marca Zeta)", name="Joana Artes")
+        self.assertLessEqual(a.priority.rank, Priority.MEDIUM.rank)
+
+    def test_sibling_tld_is_not_lookalike(self):
+        r = analyze_bio(Profile(display_name="Marca Zeta", bio="Site: marcazeta.com", links=["marcazeta.com"]), brand())
+        self.assertIn("sibling_tld", {d["class"] for d in r.domains})
+        self.assertNotIn("lookalike_link", r.groups)
+
     def test_reasons_are_explainable(self):
         a = self.prio("marcazeta_suporte", "Suporte oficial Marca Zeta. Chame no WhatsApp. Reembolso via Pix hoje!")
         self.assertTrue(any("CRÍTICO" in r for r in a.reasons))
