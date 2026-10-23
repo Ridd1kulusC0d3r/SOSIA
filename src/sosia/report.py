@@ -38,6 +38,18 @@ def to_markdown(res: ScanResult) -> str:
     c = summary_counts(res)
     out += ["| " + " | ".join(c) + " |", "|" + "---|" * len(c), "| " + " | ".join(str(v) for v in c.values()) + " |", ""]
 
+    d = m.get("discovery")
+    if d:
+        out += ["## Descoberta por busca nativa", ""]
+        if d.get("ok"):
+            out += [f"A busca devolveu {d['accounts_returned']} contas; {d['handles_containing_brand']} com a marca no handle; "
+                    f"{d['candidates_added']} adicionadas como candidatas.", ""]
+            if d.get("saturated"):
+                out += [f"> ⚠️ **Marca saturada na busca** ({d['advice']}) — "
+                        + ("`ambiguous` foi ativado automaticamente: prioridade limitada a ALTO." if d.get("ambiguous_auto") else "`ambiguous` já estava ativo."), ""]
+        else:
+            out += [f"_Descoberta indisponível nesta execução: {d.get('error')}._", ""]
+
     out += ["## Saúde dos conectores (calibração)", "",
             "| plataforma | estado | motivo | requisições | encontrados | inconclusivos | meio da varredura |", "|---|---|---|---|---|---|---|"]
     for cal in res.calibrations:

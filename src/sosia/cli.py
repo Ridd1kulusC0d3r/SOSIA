@@ -124,7 +124,8 @@ def cmd_scan(a: argparse.Namespace) -> int:
     rate = a.rate if a.rate is not None else scan_cfg.get("rate", 1.0)
     f = UrlLibFetcher(user_agent=a.user_agent, min_interval=rate, timeout=a.timeout)
     cfg = ScanConfig(budget=a.budget or scan_cfg.get("budget", 150), concurrency=a.concurrency, seed=a.seed,
-                     save_raw=a.save_raw, extra_candidates=a.watch or [], masses=_load_masses(a.priors))
+                     save_raw=a.save_raw, extra_candidates=a.watch or [], masses=_load_masses(a.priors),
+                     discover=not a.no_discover)
     _err("SÓSIA: use apenas para proteger marca/pessoa que você representa. Verificação passiva de dados públicos; "
          "sem login, sem contornar CAPTCHA/bloqueios.")
     res = Scanner(brand, plats, f, cfg, progress=_err if not a.quiet else None).run()
@@ -159,7 +160,8 @@ def cmd_watch(a: argparse.Namespace) -> int:
     rate = a.rate if a.rate is not None else scan_cfg.get("rate", 1.0)
     f = UrlLibFetcher(user_agent=a.user_agent, min_interval=rate, timeout=a.timeout)
     cfg = ScanConfig(budget=a.budget or scan_cfg.get("budget", 150), concurrency=a.concurrency, seed=a.seed,
-                     extra_candidates=a.watch or [], masses=_load_masses(a.priors))
+                     extra_candidates=a.watch or [], masses=_load_masses(a.priors),
+                     discover=not a.no_discover)
     res = Scanner(brand, plats, f, cfg, progress=None if a.quiet else _err).run()
     if res.stats["totals"]["platforms_usable"] == 0:
         _err("nenhum conector utilizável: estado NÃO atualizado (evita falso 'perfil removido')")
@@ -301,7 +303,10 @@ def cmd_discover(a: argparse.Namespace) -> int:
     brand, _ = _brand_from_args(a)
     f = UrlLibFetcher(user_agent=a.user_agent, min_interval=a.rate if a.rate is not None else 1.2, timeout=a.timeout,
                       host_intervals={"mastodon.social": 1.2})
-    accounts = discover(brand.slug, f, ())
+    errs: list[str] = []
+    accounts = discover(brand.slug, f, (), errs)
+    if errs:
+        _err("aviso: busca com falhas: " + ", ".join(sorted(set(errs))))
     amb = estimate_ambiguity(brand.slug, accounts)
     _err(f"{amb['accounts_returned']} contas na busca; {amb['handles_containing_brand']} com a marca no handle; "
          f"{'SATURADA — ' if amb['saturated'] else ''}{amb['advice']}")
@@ -399,6 +404,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seed", type=int)
     p.add_argument("--out", help="diretório do pacote de evidências")
     p.add_argument("--save-raw", action="store_true", help="guarda o corpo bruto das respostas encontradas")
+    p.add_argument("--no-discover", action="store_true", help="não usar a busca nativa (Bluesky/Mastodon) para achar candidatas")
     p.add_argument("--format", choices=["summary", "json", "jsonl", "md"], default="summary")
     p.add_argument("-q", "--quiet", action="store_true")
     p.set_defaults(fn=cmd_scan)
@@ -406,6 +412,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("watch", parents=[net], help="uma rodada de monitoramento com estado (cron/Actions)")
     _common(p)
     p.add_argument("--state", required=True, help="diretório de estado (latest.json, history/, alerts.jsonl)")
+    p.add_argument("--no-discover", action="store_true", help="não usar a busca nativa para achar candidatas")
     p.add_argument("--platform", action="append")
     p.add_argument("--budget", type=int, default=0)
     p.add_argument("--watch", action="append", help="username extra sempre consultado")

@@ -165,7 +165,7 @@ sosia scan -c sosia.toml --out runs/minha-marca --format summary
 | `sosia variants MARCA --handle HANDLE` | Não | Gerar e ranquear variantes válidas |
 | `sosia platforms` | Não | Inspecionar conectores disponíveis |
 | `sosia calibrate --validate` | Sim | Calibrar e validar os conectores localmente |
-| `sosia scan -c sosia.toml --out DIR` | Sim | Executar análise e gerar pacote de evidências |
+| `sosia scan -c sosia.toml --out DIR` | Sim | Descobre candidatas pela **busca nativa** (Bluesky/Mastodon; `--no-discover` desliga), calibra, varre e gera o pacote de evidências. Marca saturada ativa `ambiguous` sozinha |
 | `sosia triage MARCA --text "bio…"` | Não | Explicar sinais contextuais de uma bio |
 | `sosia pivots MARCA` | Não | Gerar buscas para clones sem handle semelhante |
 | `sosia diff old/case.json new/case.json` | Não | Comparar achados de duas execuções |

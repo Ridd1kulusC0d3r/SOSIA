@@ -45,3 +45,16 @@ jobs:
           assert len(app.blocks) > 10, "Interface incompleta"
           print("Frontend Gradio construído com", len(app.blocks), "componentes.")
           PY
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Smoke de instalação (wheel carrega os conectores)
+        run: |
+          pip install build
+          python -m build --wheel
+          pip install dist/*.whl
+          cd /tmp && sosia --version && sosia platforms | head -3 && sosia variants "Marca Zeta" --limit 3

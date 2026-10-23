@@ -171,3 +171,5 @@ Candidatas = 10 contas semente (descobertas pela busca, existem) + melhores vari
 4. Um conjunto pré-registrado de marcas, limiares fixados *antes* de ver os dados.
 
 > **Nota de privacidade.** Este relatório não lista handles, nomes de exibição nem bios de terceiros. Contas citadas como "plausíveis" são **hipóteses de triagem**, não acusações: não consegui verificar vínculo com a marca.
+
+> **Addendum (1.2.0).** A descoberta por busca foi integrada ao `scan`/`watch`. O critério de marca saturada passou a ser ≥40 handles com a marca **ou** ≥150 resultados do Bluesky (18/140 marcas); os limiares foram escolhidos nos mesmos dados deste bench e valem como heurística, não como medida validada.

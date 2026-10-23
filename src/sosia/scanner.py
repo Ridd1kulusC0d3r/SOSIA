@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import datetime as _dt
 import random
 import time
@@ -39,6 +40,8 @@ class ScanConfig:
     extra_candidates: list[str] = field(default_factory=list)   # watchlist: sempre consultados
     masses: dict[str, float] | None = None   # massas por família (ver `sosia fit-priors`)
     shuffle_seed: int | None = None   # embaralha a ordem de consulta (evita viés de ordem em medições)
+    discover: bool = False            # descoberta por busca nativa (Bluesky/Mastodon) antes da varredura
+    discover_max: int = 40            # teto de handles descobertos adicionados como candidatos
     record_probed: bool = False       # guarda os usernames consultados em stats (bench/auditoria)
 
 
@@ -55,6 +58,7 @@ class Scanner:
     def run(self) -> ScanResult:
         t0 = time.monotonic()
         started = _dt.datetime.now(_dt.timezone.utc)
+        discovery_meta = self._run_discovery() if self.cfg.discover else None
         engine = VariantEngine(self.brand.handle, extra_affixes=self.brand.extra_affixes, masses=self.cfg.masses)
         all_official = set().union(*self.brand.official.values()) if self.brand.official else set()
         variants = engine.generate(exclude=all_official, families=self.cfg.families)
@@ -79,6 +83,7 @@ class Scanner:
             "platforms_discarded": [f"{c.platform}:{c.state.value}" for c in cals if not c.usable],
         }
         meta = {
+            "discovery": discovery_meta,
             "tool": "sosia", "version": __version__, "started_at": started.isoformat(timespec="seconds"),
             "duration_s": round(time.monotonic() - t0, 2), "seed": self.cfg.seed,
             "config": {k: (sorted(v) if isinstance(v, set) else v) for k, v in self.cfg.__dict__.items()},
@@ -103,6 +108,38 @@ class Scanner:
         if self.cfg.shuffle_seed is not None:
             random.Random(f"{self.cfg.shuffle_seed}:{p.id}").shuffle(out)
         return out
+
+    # ------------------------------------------------------------------ descoberta por busca
+    def _run_discovery(self) -> dict:
+        """Busca nativa pelo nome da marca. Achado do bench real: a busca lista ~100% dos handles que contêm a marca; a
+        enumeração, 2–3%. Os handles viram candidatos (watchlist) e a saturação da busca liga `ambiguous` automaticamente."""
+        from .discovery import discover, estimate_ambiguity, handle_class, local_part
+        errs: list[str] = []
+        try:
+            accounts = discover(self.brand.slug, self.fetcher, (), errs)
+        except Exception as e:  # noqa: BLE001 — descoberta é opcional; falha não derruba a varredura
+            return {"ok": False, "error": f"{type(e).__name__}: {e}"[:160]}
+        if errs and not accounts:
+            return {"ok": False, "error": "busca indisponível (" + ", ".join(sorted(set(errs))) + ")"}
+        amb = estimate_ambiguity(self.brand.slug, accounts)
+        official = set().union(*self.brand.official.values()) if self.brand.official else set()
+        rank = {"contains": 0, "similar": 1}
+        found: list[tuple[int, int, str]] = []
+        for acc in accounts:
+            lp = local_part(acc)
+            if not lp or lp in official or lp == self.brand.slug:
+                continue
+            cls = handle_class(self.brand.slug, lp)
+            if cls in rank:
+                found.append((rank[cls], len(lp), lp))
+        added = list(dict.fromkeys(lp for _, _, lp in sorted(found)))[: self.cfg.discover_max]
+        self.cfg.extra_candidates = list(dict.fromkeys([*self.cfg.extra_candidates, *added]))
+        auto = amb["saturated"] and not self.brand.ambiguous
+        if auto:
+            self.brand = dataclasses.replace(self.brand, ambiguous=True)
+        return {"ok": True, "accounts_returned": amb["accounts_returned"], "handles_containing_brand": amb["handles_containing_brand"],
+                "saturated": amb["saturated"], "ambiguous_auto": auto, "candidates_added": len(added), "advice": amb["advice"],
+                "partial_errors": sorted(set(errs))}
 
     # ------------------------------------------------------------------ internos
     def _probe(self, p: Platform, cal: Calibration, u: str, stat: dict) -> tuple[Verdict, Response]:

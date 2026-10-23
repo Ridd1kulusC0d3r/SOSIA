@@ -95,3 +95,16 @@ Detalhes e números em [`REAL_BENCH.md`](REAL_BENCH.md). Resumo das decisões qu
 
 **Lição de processo.** Cada correção foi ditada pelo conjunto de dados que a expôs, então aquele conjunto deixa de ser teste. Por isso há 5 conjuntos
 disjuntos, e só o último (#4, regras congeladas) é limpo. Mesmo ele só mede *carga de alertas*, não detecção.
+
+
+## 10. Descoberta integrada (1.2.0)
+
+`Scanner(cfg.discover=True)` — padrão no CLI e no webapp — consulta a busca nativa pelo nome da marca **antes** de gerar variantes: os handles que contêm a marca
+(`contains`/`similar`, até `discover_max=40`) viram candidatas (watchlist) para todos os conectores, e a saturação da busca liga `ambiguous` automaticamente.
+Decisões:
+- **Falha de descoberta nunca derruba a varredura**, mas também não é silenciosa: `meta.discovery.ok=false` e o relatório diz "Descoberta indisponível" (zero resultados por erro 429
+  parecia "marca não saturada" e enganaria o usuário).
+- **Critério de saturação**: ≥40 handles com a marca **ou** ≥150 resultados do Bluesky (busca perto do teto de ~195). O critério anterior (só ≥40) deixava passar `washington`
+  (32 handles, mas ~25 falsos "Official account…" no bench real). Os limiares foram escolhidos olhando as 140 marcas do bench (18 sinalizadas, 13%) — **não são independentes dos dados**.
+- **Privacidade**: a descoberta envia o nome da marca às APIs de busca de Bluesky e Mastodon (a varredura já enviava handles às plataformas). `--no-discover` evita isso.
+- Limite herdado do R1: a busca só cobre redes com busca pública sem login. Instagram, TikTok, Telegram e X continuam dependendo da enumeração e de `--watch`.

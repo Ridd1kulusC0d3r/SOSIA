@@ -126,7 +126,7 @@ def run_investigation(name: str, handle: str, domains: str, official: str,
     result = Scanner(
         brand, requested,
         UrlLibFetcher(min_interval=rate, timeout=12),
-        ScanConfig(budget=budget, save_raw=False, concurrency=min(4, len(requested))),
+        ScanConfig(budget=budget, save_raw=False, concurrency=min(4, len(requested)), discover=True),
     ).run()
     out = Path("/content/runs_frontend") / (
         (slugify(brand.handle) or "brand") + "-" +
